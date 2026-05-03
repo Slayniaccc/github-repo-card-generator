@@ -26,7 +26,10 @@ async function getGithub(userName){
 const response = await fetch(url);
 const result = await response.json()
 const profile = document.getElementById("profile");
-profile.innerHTML = `${result.name}, <img src="${result.avatar_url}">, ${result.login}`;
+profile.innerHTML = 
+`<h1>${result.name}</h1>
+<img src="${result.avatar_url}">
+ <p>${result.login}</p>`
 
     console.log(result);
   } catch (err){
