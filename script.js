@@ -1,4 +1,4 @@
-console.log("KS");
+
 
 const repoform = document.getElementById("repoform");
 const username = document.getElementById("username");
@@ -20,7 +20,8 @@ function githubSearch(userName){
 getGithub(userName)
 }
 async function getGithub(userName){
-  const url = `https://api.github.com/users/${userName}`;
+  const url =  `https://api.github.com/users/${userName}` 
+   
   try{
 
 const response = await fetch(url);
@@ -40,4 +41,15 @@ profile.innerHTML =
   } catch (err){
     console.log(err)
   }
+  }
+
+  async function getRepos(userName){
+    const url2 = `https://api.github.com/users/${userName}/repos` 
+    try{
+      const response2 = await fetch(url2);
+const result2 = await response2.json()
+console.log(result2)
+    } catch (nope){
+      console.log(nope)
+    }
   }
