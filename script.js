@@ -17,5 +17,16 @@ const value = username.value
 
 
 function githubSearch(userName){
-console.log(userName)
+getGithub(userName)
+}
+async function getGithub(userName){
+  const url = `https://api.github.com/users/${userName}`;
+  try{
+const response = await fetch(url);
+const result = await response.json()
+
+    console.log(result);
+  } catch (err){
+    console.log(err)
+  }
 }
