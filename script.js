@@ -22,8 +22,11 @@ getGithub(userName)
 async function getGithub(userName){
   const url = `https://api.github.com/users/${userName}`;
   try{
+
 const response = await fetch(url);
 const result = await response.json()
+const profile = document.getElementById("profile");
+profile.innerHTML = `${result.name}, <img src="${result.avatar_url}">, ${result.login}`;
 
     console.log(result);
   } catch (err){
