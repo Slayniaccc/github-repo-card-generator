@@ -28,8 +28,8 @@ const response = await fetch(url);
 const result = await response.json()
 const profile = document.getElementById("profile");
 profile.innerHTML = 
-`<h1> Username: ${result.name}</h1>
-<img src="${result.avatar_url}">
+
+`<img src="${result.avatar_url}">
  <p>${result.login}</p>
  <p>${result.bio}</p>
  <p> Followers: ${result.followers}</p>
