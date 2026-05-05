@@ -1,9 +1,10 @@
 
 
-const repoform = document.getElementById("repoform");
+const repoForm = document.getElementById("repoForm");
 const username = document.getElementById("username");
+const reposDiv = document.getElementById("repos");
 
-repoform.addEventListener("submit" , repoFormClick);
+repoForm.addEventListener("submit" , repoFormClick);
 
 function repoFormClick(event) {
     event.preventDefault();
@@ -18,6 +19,7 @@ const value = username.value
 
 function githubSearch(userName){
 getGithub(userName)
+getRepos(userName)
 }
 async function getGithub(userName){
   const url =  `https://api.github.com/users/${userName}` 
@@ -49,7 +51,21 @@ profile.innerHTML =
       const response2 = await fetch(url2);
 const result2 = await response2.json()
 console.log(result2)
-    } catch (nope){
-      console.log(nope)
-    }
-  }
+ 
+  const sortedRepo = result2.sort((repo1, repo2) => repo2.stargazers_count - repo1.stargazers_count)
+const topRepo = sortedRepo.slice(0, 5)
+let repoHTML = ""
+ topRepo.forEach(function(repo){
+
+repoHTML += 
+`<p> Repo Name: ${repo.name}</p>
+<p> Repo Description: ${repo.description}</p>
+<p> Repo Stars: ${repo.stargazers_count}</p>
+<p> Repo Language: ${repo.language}</p>
+ <a href="${repo.html_url}" target="_blank">View Github Repository</a>`
+
+ })
+reposDiv.innerHTML = repoHTML
+  } catch(nope){
+    console.log(nope)
+  }}
