@@ -29,9 +29,9 @@ const result = await response.json()
 const profile = document.getElementById("profile");
 profile.innerHTML = 
 
-`<img src="${result.avatar_url}">
- <p>${result.login}</p>
- <p>${result.bio}</p>
+`<img src="${result.avatar_url}"></img>
+ <h1>${result.login}</h1>
+ <p>${result.bio|| "No bio available"}</p>
  <p> Followers: ${result.followers}</p>
  <p>Public Repos: ${result.public_repos}</p>
  <a href="${result.html_url}" target="_blank">View Github Profile</a>`
