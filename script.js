@@ -58,11 +58,13 @@ let repoHTML = ""
  topRepo.forEach(function(repo){
 
 repoHTML += 
+<div class="repo-card">
 `<p> Repo Name: ${repo.name}</p>
 <p> Repo Description: ${repo.description}</p>
 <p> Repo Stars: ${repo.stargazers_count}</p>
 <p> Repo Language: ${repo.language}</p>
  <a href="${repo.html_url}" target="_blank">View Github Repository</a>`
+ </div>
 
  })
 reposDiv.innerHTML = repoHTML
