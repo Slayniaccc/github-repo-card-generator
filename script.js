@@ -31,7 +31,7 @@ const result = await response.json()
 const profile = document.getElementById("profile");
 profile.innerHTML = 
 
-`<img src="${result.avatar_url}"></img>
+`<img src="${result.avatar_url}" alt="${result.login}'s avatar">
  <h1>${result.login}</h1>
  <p>${result.bio|| "No bio available"}</p>
  <p> Followers: ${result.followers}</p>
@@ -57,14 +57,14 @@ const topRepo = sortedRepo.slice(0, 5)
 let repoHTML = ""
  topRepo.forEach(function(repo){
 
-repoHTML += 
+repoHTML += `
 <div class="repo-card">
-`<p> Repo Name: ${repo.name}</p>
+<p> Repo Name: ${repo.name}</p>
 <p> Repo Description: ${repo.description}</p>
 <p> Repo Stars: ${repo.stargazers_count}</p>
 <p> Repo Language: ${repo.language}</p>
- <a href="${repo.html_url}" target="_blank">View Github Repository</a>`
- </div>
+ <a href="${repo.html_url}" target="_blank">View Github Repository</a>
+ </div>`
 
  })
 reposDiv.innerHTML = repoHTML
