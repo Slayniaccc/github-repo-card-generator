@@ -13,9 +13,9 @@ body{
 #repos{
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-    margin: 15px;
+    gap: 10px;
+    padding: 25px;
+    margin: 25px;
 }
 
 #profile {
@@ -23,6 +23,14 @@ body{
     margin: 25px;
     padding: 25px;
 }
+#username{
+
+}
+button {
+  background-color: black;
+  color: white;
+}
+
 
 #profile img {
     width: 150px;
@@ -32,8 +40,12 @@ body{
 }
 
 .repo-card{
-    border: 2px solid pink;
+    border: 2px solid white;
     padding: 20px;
     border-radius: 10px;
     margin: 20px;
+ 
+}
+.repo-card p {
+    font-weight: bold;
 }
