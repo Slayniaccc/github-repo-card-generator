@@ -9,15 +9,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-<h1>Github Repo Card Generator</h1>
-<p>Enter a GitHub username to view profile details, followers, and repositories: </p>
+<div class="container">
+        <header>
+            <h1><i class="fab fa-github"></i> GitHub Repo Card Generator</h1>
+             <p class="subtitle">Enter a GitHub username to view profile details, followers, and repositories</p>
+        </header>
 <form id="repoForm">
-     <label for="username">Enter Username: </label>
-    <input type="text" id="username">
-   
-    <button type="submit"> Submit here: </button>
-   
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+            type="text" 
+            id="username" 
+            placeholder="Enter GitHub username..." 
+            required
+            autocomplete="username"
+        />
+        <button type="submit" id="searchBtn">
+            <i class="fas fa-arrow-right"></i> Search
+        </button>
+    </div>
 </form>
+<div id="loading" class="hidden">
+    <div class="spinner"></div>
+    <p>Loading user data...</p>
+</div>
+
  <div id="profile"></div>
     <div id="repos"> </div>
   <script src="script.js"></script>
