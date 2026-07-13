@@ -1,57 +1,16 @@
-body{
-    background: grey;
-    font-family: sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-#repoForm{
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    align-items: center;
-}
-
-#repos{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 25px;
-    margin: 25px;
-}
-
-#profile {
-    text-align: center;
-    margin: 25px;
-    padding: 25px;
-}
-
-#username{
-    font-weight: bold;
-    padding:10px;
-    margin: 10px;
-    border: 2px solid black;
- width: 85px;
-
-}
-button {
-  background-color: black;
-  color: white;
-}
-
-
-#profile img {
-    width: 150px;
-    border: 2px solid black;
-    margin: 20px;
-    border-radius: 50%;
-}
-
-.repo-card{
-    border: 2px solid white;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px;
-     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-}
-.repo-card p {
-    font-weight: bold;
+:root {
+    --primary: #2b3137;
+    --secondary: #f0f6fc;
+    --accent: #238636;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --radius: 12px;
+    --transition: all 0.3s ease;
 }
