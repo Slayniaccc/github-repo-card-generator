@@ -117,3 +117,81 @@ header h1 i {
     opacity: 0.7;
     cursor: not-allowed;
 }
+/* Profile Section */
+#profile {
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px;
+    margin: 20px 0 30px;
+    text-align: center;
+    display: none;
+}
+
+#profile img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid var(--accent);
+    margin-bottom: 20px;
+    transition: var(--transition);
+}
+
+#profile img:hover {
+    transform: scale(1.05);
+}
+
+#profile h1 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+#profile .bio {
+    color: #8b949e;
+    margin-bottom: 16px;
+    font-style: italic;
+}
+
+#profile .stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #21262d;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.stat-item i {
+    color: var(--accent);
+}
+
+.stat-item span {
+    font-weight: bold;
+    color: #fff;
+}
+
+#profile .profile-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 24px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+#profile .profile-link:hover {
+    background: #2ea043;
+    transform: translateY(-2px);
+}
