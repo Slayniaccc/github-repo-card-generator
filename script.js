@@ -39,3 +39,21 @@ const languageColors = {
     Angular: '#dd0031',
     default: '#8b949e',
 };
+// Event Listeners
+elements.form.addEventListener('submit', handleSubmit);
+
+// Enter key support
+elements.username.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        elements.form.dispatchEvent(new Event('submit'));
+    }
+});
+
+// Keyboard shortcut: Ctrl+/ to focus search
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        elements.username.focus();
+    }
+});
