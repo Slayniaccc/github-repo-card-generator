@@ -57,3 +57,53 @@ document.addEventListener('keydown', (e) => {
         elements.username.focus();
     }
 });
+async function handleSubmit(event) {
+    event.preventDefault();
+    const username = elements.username.value.trim();
+
+    if (!username) {
+        showError('Please enter a GitHub username');
+        return;
+    }
+
+    await searchGitHub(username);
+}
+
+async function searchGitHub(username) {
+    clearResults();
+    showLoading(true);
+
+    try {
+        // Check cache first
+        const cacheKey = `github_${username}`;
+        if (cache.has(cacheKey)) {
+            const cached = cache.get(cacheKey);
+            if (Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
+                displayResults(cached.data);
+                showLoading(false);
+                return;
+            }
+        }
+
+        // Fetch user and repos in parallel
+        const [userData, reposData] = await Promise.all([
+            fetchUser(username),
+            fetchRepos(username),
+        ]);
+
+        const data = { user: userData, repos: reposData };
+        
+        // Cache the data
+        cache.set(cacheKey, {
+            data,
+            timestamp: Date.now(),
+        });
+
+        displayResults(data);
+        showLoading(false);
+    } catch (error) {
+        console.error('Error:', error);
+        showError(error.message || 'Failed to fetch user data');
+        showLoading(false);
+    }
+}
