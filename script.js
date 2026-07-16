@@ -235,3 +235,50 @@ function displayRepos(repos) {
 
     elements.repos.innerHTML = reposHTML;
 }
+// Utility Functions
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+}
+
+function showLoading(show) {
+    elements.loading.classList.toggle('hidden', !show);
+    elements.searchBtn.disabled = show;
+    elements.searchBtn.innerHTML = show ? 
+        '<i class="fas fa-spinner fa-spin"></i> Searching...' : 
+        '<i class="fas fa-arrow-right"></i> Search';
+}
+
+function showError(message) {
+    elements.error.textContent = message;
+    elements.error.classList.add('show');
+    setTimeout(() => {
+        elements.error.classList.remove('show');
+    }, 5000);
+}
+
+function clearResults() {
+    elements.profile.innerHTML = '';
+    elements.profile.style.display = 'none';
+    elements.repos.innerHTML = '';
+    elements.error.classList.remove('show');
+}
