@@ -282,3 +282,15 @@ function clearResults() {
     elements.repos.innerHTML = '';
     elements.error.classList.remove('show');
 }
+// AI Feature 1: Smart Search with Suggestions
+async function suggestUsers(partialUsername) {
+    if (partialUsername.length < 2) return;
+    
+    try {
+        const response = await fetch(`${CONFIG.GITHUB_API}/search/users?q=${partialUsername}&per_page=5`);
+        const data = await response.json();
+        console.log('Suggestions:', data.items.map(user => user.login));
+    } catch (error) {
+        console.error('Suggestion error:', error);
+    }
+}
