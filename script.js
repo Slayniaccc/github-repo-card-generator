@@ -311,3 +311,14 @@ function analyzeRepos(repos) {
 
     return analysis;
 }
+// AI Feature 3: Export Results as JSON
+function exportData(data) {
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `github_${data.user.login}_data.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
