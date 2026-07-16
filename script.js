@@ -132,4 +132,106 @@ async function fetchRepos(username) {
     const repos = await response.json();
     return repos;
 }
-    
+function displayResults(data) {
+    const { user, repos } = data;
+    displayProfile(user);
+    displayRepos(repos);
+}
+
+function displayProfile(user) {
+    const profileHTML = `
+        <img src="${user.avatar_url}" alt="${user.login}'s avatar" loading="lazy" />
+        <h1>${user.name || user.login}</h1>
+        <p class="bio">${user.bio || 'No bio available'}</p>
+        <div class="stats">
+            <div class="stat-item">
+                <i class="fas fa-users"></i>
+                <span>${formatNumber(user.followers)}</span> followers
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-user-friends"></i>
+                <span>${formatNumber(user.following)}</span> following
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-code"></i>
+                <span>${formatNumber(user.public_repos)}</span> repos
+            </div>
+            ${user.location ? `
+                <div class="stat-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${user.location}
+                </div>
+            ` : ''}
+            ${user.company ? `
+                <div class="stat-item">
+                    <i class="fas fa-building"></i>
+                    ${user.company}
+                </div>
+            ` : ''}
+        </div>
+        <a href="${user.html_url}" target="_blank" class="profile-link">
+            <i class="fab fa-github"></i> View GitHub Profile
+        </a>
+    `;
+
+    elements.profile.innerHTML = profileHTML;
+    elements.profile.style.display = 'block';
+}
+
+function displayRepos(repos) {
+    // Sort by stars and take top 5
+    const sortedRepos = repos
+        .sort((a, b) => b.stargazers_count - a.stargazers_count)
+        .slice(0, CONFIG.MAX_REPOS);
+
+    if (sortedRepos.length === 0) {
+        elements.repos.innerHTML = '<p>No repositories found</p>';
+        return;
+    }
+
+    let reposHTML = '';
+    sortedRepos.forEach((repo, index) => {
+        const languageColor = repo.language ? languageColors[repo.language] || languageColors.default : languageColors.default;
+        
+        reposHTML += `
+            <div class="repo-card" style="animation-delay: ${index * 0.1}s">
+                <h3>
+                    <i class="fas fa-book"></i>
+                    ${repo.name}
+                </h3>
+                ${repo.description ? `<p class="description">${repo.description}</p>` : ''}
+                <div class="repo-meta">
+                    ${repo.language ? `
+                        <span>
+                            <span class="language-color" style="background-color: ${languageColor}"></span>
+                            ${repo.language}
+                        </span>
+                    ` : ''}
+                    ${repo.stargazers_count > 0 ? `
+                        <span>
+                            <i class="fas fa-star" style="color: #f1e05a;"></i>
+                            ${formatNumber(repo.stargazers_count)}
+                        </span>
+                    ` : ''}
+                    ${repo.forks_count > 0 ? `
+                        <span>
+                            <i class="fas fa-code-branch"></i>
+                            ${formatNumber(repo.forks_count)}
+                        </span>
+                    ` : ''}
+                    ${repo.updated_at ? `
+                        <span>
+                            <i class="fas fa-clock"></i>
+                            ${formatDate(repo.updated_at)}
+                        </span>
+                    ` : ''}
+                </div>
+                <a href="${repo.html_url}" target="_blank" class="repo-link">
+                    View Repository <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+        `;
+    });
+
+    elements.repos.innerHTML = reposHTML;
+}
