@@ -322,3 +322,22 @@ function exportData(data) {
     a.click();
     URL.revokeObjectURL(url);
 }
+// AI Feature 4: Share Results
+function shareResults(username) {
+    if (navigator.share) {
+        navigator.share({
+            title: `GitHub Profile: ${username}`,
+            text: `Check out ${username}'s GitHub profile!`,
+            url: `https://github.com/${username}`,
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(`https://github.com/${username}`)
+            .then(() => alert('Profile URL copied to clipboard!'))
+            .catch(() => {});
+    }
+}
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('🔍 GitHub Repo Card Generator loaded!');
+});
