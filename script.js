@@ -294,3 +294,20 @@ async function suggestUsers(partialUsername) {
         console.error('Suggestion error:', error);
     }
 }
+// AI Feature 2: Repository Analysis
+function analyzeRepos(repos) {
+    const analysis = {
+        totalStars: repos.reduce((sum, repo) => sum + repo.stargazers_count, 0),
+        totalForks: repos.reduce((sum, repo) => sum + repo.forks_count, 0),
+        languages: {},
+        mostPopular: repos.sort((a, b) => b.stargazers_count - a.stargazers_count)[0],
+    };
+
+    repos.forEach(repo => {
+        if (repo.language) {
+            analysis.languages[repo.language] = (analysis.languages[repo.language] || 0) + 1;
+        }
+    });
+
+    return analysis;
+}
