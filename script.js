@@ -69,7 +69,7 @@ async function handleSubmit(event) {
     await searchGitHub(username);
 }
 
-async function searchGitHub(username) {
+async function searchGitHub(username) { //takes validated username and fetches user data and repos from GitHub API, handles caching, and displays results or errors
     clearResults();
     showLoading(true);
 
@@ -106,4 +106,30 @@ async function searchGitHub(username) {
         showError(error.message || 'Failed to fetch user data');
         showLoading(false);
     }
+    async function fetchUser(username) {
+    const url = `${CONFIG.GITHUB_API}/users/${username}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        if (response.status === 404) {
+            throw new Error(`User "${username}" not found`);
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+async function fetchRepos(username) {
+    const url = `${CONFIG.GITHUB_API}/users/${username}/repos?sort=updated&per_page=100`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch repositories`);
+    }
+
+    const repos = await response.json();
+    return repos;
+}
+    
 }
