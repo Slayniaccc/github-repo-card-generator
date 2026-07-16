@@ -106,6 +106,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
         showError(error.message || 'Failed to fetch user data');
         showLoading(false);
     }
+}
     async function fetchUser(username) {
     const url = `${CONFIG.GITHUB_API}/users/${username}`;
     const response = await fetch(url);
@@ -132,4 +133,3 @@ async function fetchRepos(username) {
     return repos;
 }
     
-}
