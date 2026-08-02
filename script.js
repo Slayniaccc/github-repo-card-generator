@@ -2,10 +2,10 @@
 const CONFIG = {
     GITHUB_API: 'https://api.github.com',
     MAX_REPOS: 5,
-    CACHE_DURATION: 5 * 60 * 1000,
-};
+    CACHE_DURATION: 5 * 60 * 1000, // conserves API calls by reusing recent results for up to 5 mins, expires after 5 mins
+}; //holds tunable constants
 // Cache for API responses
-const cache = new Map();
+const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
 // DOM Elements
 const elements = {
     form: document.getElementById('repoForm'),
@@ -14,7 +14,7 @@ const elements = {
     repos: document.getElementById('repos'),
     loading: document.getElementById('loading'),
     error: document.getElementById('error'),
-    searchBtn: document.getElementById('searchBtn'),
+    searchBtn: document.getElementById('searchBtn'), 
 };
 // Language colors mapping
 const languageColors = {
@@ -40,20 +40,13 @@ const languageColors = {
     default: '#8b949e',
 };
 // Event Listeners
-elements.form.addEventListener('submit', handleSubmit);
+elements.form.addEventListener('submit', handleSubmit); //references the handlesubmit function
 
-// Enter key support
-elements.username.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        elements.form.dispatchEvent(new Event('submit'));
-    }
-});
 
 // Keyboard shortcut: Ctrl+/ to focus search
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-        e.preventDefault();
+        e.preventDefault(); //stops browser's own shortcut
         elements.username.focus();
     }
 });
@@ -83,7 +76,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
                 showLoading(false);
                 return;
             }
-        }
+        } // asks if the name has been searched,and if the entry doesnt exist yet it pulls the data fresh
 
         // Fetch user and repos in parallel
         const [userData, reposData] = await Promise.all([
@@ -97,7 +90,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
         cache.set(cacheKey, {
             data,
             timestamp: Date.now(),
-        });
+        });  //fetches username and repository amount at the same time, bundles as an object, caches the impormation
 
         displayResults(data);
         showLoading(false);
@@ -105,8 +98,8 @@ async function searchGitHub(username) { //takes validated username and fetches u
         console.error('Error:', error);
         showError(error.message || 'Failed to fetch user data');
         showLoading(false);
-    }
-}
+    } // on error: log for debugging, show the user a message, stop the spinner
+} 
     async function fetchUser(username) {
     const url = `${CONFIG.GITHUB_API}/users/${username}`;
     const response = await fetch(url);
