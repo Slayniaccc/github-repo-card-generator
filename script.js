@@ -81,6 +81,14 @@ async function searchGitHub(username) { //takes validated username and fetches u
                 return;
             }
         } // asks if the name has been searched,and if the entry doesnt exist yet it pulls the data fresh
+        if (cache.has(cacheKey)) {
+    const cached = cache.get(cacheKey);
+    if (Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
+        displayResults(cached.data);
+        return;
+    }
+    cache.delete(cacheKey);  // expired — drop it
+}
 
         // Fetch user and repos in parallel
         const [userData, reposData] = await Promise.all([
@@ -226,7 +234,7 @@ function displayRepos(repos) {
                         </span>
                     ` : ''}
                 </div>
-                <a href="${repo.html_url}" target="_blank" class="repo-link">
+                <a href="${repo.html_url}" rel="noopener noreferrer" target="_blank" class="repo-link">
                     View Repository <i class="fas fa-external-link-alt"></i>
                 </a>
             </div>
