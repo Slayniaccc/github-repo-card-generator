@@ -265,7 +265,7 @@ function formatDate(dateString) {
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) {
         const w = Math.floor(diffDays / 7)
-        return w === 1 ? '1 week ago' : '${w} weeks ago'
+        return w === 1 ? '1 week ago' :  `${w} weeks ago`; 
     }
     if (diffDays < 365){
         const m = Math.floor(diffDays/30)
