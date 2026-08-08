@@ -1,9 +1,12 @@
 // Add this at the very top of script.js
-const CONFIG = {
+const CONFIG = Object.freeze({
     GITHUB_API: 'https://api.github.com',
     MAX_REPOS: 5,
     CACHE_DURATION: 5 * 60 * 1000, // conserves API calls by reusing recent results for up to 5 mins, expires after 5 mins
-}; //holds tunable constants
+     REPOS_PER_PAGE: 100,
+    SUGGESTION_LIMIT: 5,
+    ERROR_DISPLAY_MS: 5000,
+}); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
 function escapeHTML(str) {
@@ -14,8 +17,7 @@ function escapeHTML(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-} //neutralises user-supplied text so browser renders it as visible chars instead of executing it as HTML or Javascript
-// DOM Elements
+} //prevents <script> style code from being run in the browser
 const elements = {
     form: document.getElementById('repoForm'),
     username: document.getElementById('username'),
@@ -52,13 +54,6 @@ const languageColors = {
 elements.form.addEventListener('submit', handleSubmit); //references the handlesubmit function
 
 
-// Keyboard shortcut: Ctrl+/ to focus search
-document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-        e.preventDefault(); //stops browser's own shortcut
-        elements.username.focus();
-    }
-});
 async function handleSubmit(event) {
     event.preventDefault();
     const username = elements.username.value.trim();
@@ -255,14 +250,22 @@ function formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
+    if (diffDays < 30) {
+        const w = Math.floor(diffDays / 7)
+        return w === 1 ? '1 week ago' : '${w} weeks ago'
+    }
+    if (diffDays < 365){
+        const m = Math.floor(diffDays/30)
+         return m === 1 ? '1 month ago' : `${m} months ago`;
+
+    }
+    const y = Math.floor(diffDays / 365);
+return y === 1 ? '1 year ago' : `${y} years ago`;
 }
 // toggles loading UI: spinner visibility, button disabled state, and button label
 function showLoading(show) {
@@ -272,14 +275,7 @@ function showLoading(show) {
         '<i class="fas fa-spinner fa-spin"></i> Searching...' : 
         '<i class="fas fa-arrow-right"></i> Search';
 }
-//shows the error msg after 5 seconds
-function showError(message) {
-    elements.error.textContent = message;
-    elements.error.classList.add('show');
-    setTimeout(() => {
-        elements.error.classList.remove('show');
-    }, 5000);
-}
+
 //wipes the profile, hides error message,empties repo information
 function clearResults() {
     elements.profile.innerHTML = '';
