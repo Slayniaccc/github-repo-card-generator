@@ -74,14 +74,6 @@ async function searchGitHub(username) { //takes validated username and fetches u
         // Check cache first
         const cacheKey = `github_${username}`;
         if (cache.has(cacheKey)) {
-            const cached = cache.get(cacheKey);
-            if (Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
-                displayResults(cached.data);
-                showLoading(false);
-                return;
-            }
-        } // asks if the name has been searched,and if the entry doesnt exist yet it pulls the data fresh
-        if (cache.has(cacheKey)) {
     const cached = cache.get(cacheKey);
     if (Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
         displayResults(cached.data);
@@ -105,7 +97,6 @@ async function searchGitHub(username) { //takes validated username and fetches u
         });  //fetches username and repository amount at the same time, bundles as an object, caches the impormation
 
         displayResults(data);
-        showLoading(false);
     } catch (error) {
         console.error('Error:', error);
         showError(error.message || 'Failed to fetch user data');
@@ -130,7 +121,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
 } //crafts the url,fetches it.If there is an error message,error messages are thrown.In case of success user data returned as JS object
 
 async function fetchRepos(username) {
-    const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=100`;
+    const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=${CONFIG.REPOS_PER_PAGE}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -148,9 +139,9 @@ function displayResults(data) {
 
 function displayProfile(user) {
     const profileHTML = `
-        <img src="${user.avatar_url}" alt="${user.login}'s avatar" loading="lazy" />
+        <img src="${user.avatar_url}" alt="${escapeHTML(user.login)}'s avatar" loading="lazy" />
         <h1>${escapeHTML(user.name || user.login)}</h1>
-        <p class="bio">${user.bio || 'No bio available'}</p>
+        <p class="bio">${escapeHTML(user.bio) || 'No bio available'}</p>
         <div class="stats">
             <div class="stat-item">
                 <i class="fas fa-users"></i>
@@ -177,14 +168,14 @@ function displayProfile(user) {
                 </div>
             ` : ''}
         </div>
-        <a href="${user.html_url}" target="_blank" class="profile-link">
+        <a href="${user.html_url}" target="_blank" rel="noopener noreferrer" class="profile-link">
             <i class="fab fa-github"></i> View GitHub Profile
         </a>
     `;
 //formatting of the whole profile
     elements.profile.innerHTML = profileHTML;
     elements.profile.style.display = 'block';
-} //actual github profile now opened in a new tab
+} //builds a link to the github profile that opens in a new tab when clicked
 
 function displayRepos(repos) {
     // Sort by stars and take top 5
@@ -207,7 +198,7 @@ function displayRepos(repos) {
                     <i class="fas fa-book"></i>
                     ${escapeHTML(repo.name)}
                 </h3>
-                ${repo.description ? `<p class="description">${repo.description}</p>` : ''}
+                ${repo.description ? `<p class="description">${escapeHTML(repo.description)}</p>` : ''}
                 <div class="repo-meta">
                     ${repo.language ? `
                         <span>
@@ -264,16 +255,15 @@ function formatDate(dateString) {
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) {
-        const w = Math.floor(diffDays / 7)
-        return w === 1 ? '1 week ago' :  `${w} weeks ago`; 
+        const w = Math.floor(diffDays / 7);
+        return w === 1 ? '1 week ago' : `${w} weeks ago`;
     }
-    if (diffDays < 365){
-        const m = Math.floor(diffDays/30)
-         return m === 1 ? '1 month ago' : `${m} months ago`;
-
+    if (diffDays < 365) {
+        const m = Math.floor(diffDays / 30);
+        return m === 1 ? '1 month ago' : `${m} months ago`;
     }
     const y = Math.floor(diffDays / 365);
-return y === 1 ? '1 year ago' : `${y} years ago`;
+    return y === 1 ? '1 year ago' : `${y} years ago`;
 }
 // toggles loading UI: spinner visibility, button disabled state, and button label
 function showLoading(show) {
@@ -296,7 +286,7 @@ async function suggestUsers(partialUsername) {
     if (partialUsername.length < 2) return;
     
     try {
-        const response = await fetch(`${CONFIG.GITHUB_API}/search/users?q=${partialUsername}&per_page=5`);
+        const response = await fetch(`${CONFIG.GITHUB_API}/search/users?q=${encodeURIComponent(partialUsername)}&per_page=${CONFIG.SUGGESTION_LIMIT}`);
         const data = await response.json();
         console.log('Suggestions:', data.items.map(user => user.login));
     } catch (error) {
