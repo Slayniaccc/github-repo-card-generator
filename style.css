@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
+} 
 
 :root {
     --primary: #2b3137;
@@ -326,7 +326,7 @@ header h1 i {
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
-    to { opacity: 1; }
+    to { opacity: 1; } /* from transparent to solid*/
 }
 
 @keyframes fadeInDown {
@@ -338,7 +338,7 @@ header h1 i {
         opacity: 1;
         transform: translateY(0);
     }
-}
+}  /*fades in whilst sliding down 20px from its og spot*/
 
 @keyframes slideUp {
     from {
@@ -349,10 +349,10 @@ header h1 i {
         opacity: 1;
         transform: translateY(0);
     }
-}
+} /*slides up 20px*/
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to { transform: rotate(360deg); } /*full 360 deg rotation*/
 }
 
 @keyframes shake {

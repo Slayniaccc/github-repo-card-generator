@@ -6,6 +6,15 @@ const CONFIG = {
 }; //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
+function escapeHTML(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+} //neutralises user-supplied text so browser renders it as visible chars instead of executing it as HTML or Javascript
 // DOM Elements
 const elements = {
     form: document.getElementById('repoForm'),
@@ -97,11 +106,14 @@ async function searchGitHub(username) { //takes validated username and fetches u
     } catch (error) {
         console.error('Error:', error);
         showError(error.message || 'Failed to fetch user data');
+
+     }finally{
         showLoading(false);
+     } 
     } // on error: log for debugging, show the user a message, stop the spinner
-} 
+
     async function fetchUser(username) {
-    const url = `${CONFIG.GITHUB_API}/users/${username}`;
+    const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -112,10 +124,10 @@ async function searchGitHub(username) { //takes validated username and fetches u
     }
 
     return await response.json();
-}
+} //crafts the url,fetches it.If there is an error message,error messages are thrown.In case of success user data returned as JS object
 
 async function fetchRepos(username) {
-    const url = `${CONFIG.GITHUB_API}/users/${username}/repos?sort=updated&per_page=100`;
+    const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=100`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -123,18 +135,18 @@ async function fetchRepos(username) {
     }
 
     const repos = await response.json();
-    return repos;
+    return repos; //similar to previous function, however returns information on repositories.
 }
 function displayResults(data) {
     const { user, repos } = data;
     displayProfile(user);
     displayRepos(repos);
-}
+} //unpacks user and repos out of data,displays profile and repo info
 
 function displayProfile(user) {
     const profileHTML = `
         <img src="${user.avatar_url}" alt="${user.login}'s avatar" loading="lazy" />
-        <h1>${user.name || user.login}</h1>
+        <h1>${escapeHTML(user.name || user.login)}</h1>
         <p class="bio">${user.bio || 'No bio available'}</p>
         <div class="stats">
             <div class="stat-item">
@@ -152,13 +164,13 @@ function displayProfile(user) {
             ${user.location ? `
                 <div class="stat-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    ${user.location}
+                    ${escapeHTML(user.location)}
                 </div>
             ` : ''}
             ${user.company ? `
                 <div class="stat-item">
                     <i class="fas fa-building"></i>
-                    ${user.company}
+                   ${escapeHTML(user.company)}
                 </div>
             ` : ''}
         </div>
@@ -166,14 +178,14 @@ function displayProfile(user) {
             <i class="fab fa-github"></i> View GitHub Profile
         </a>
     `;
-
+//formatting of the whole profile
     elements.profile.innerHTML = profileHTML;
     elements.profile.style.display = 'block';
-}
+} //actual github profile now opened in a new tab
 
 function displayRepos(repos) {
     // Sort by stars and take top 5
-    const sortedRepos = repos
+    const sortedRepos = [...repos]
         .sort((a, b) => b.stargazers_count - a.stargazers_count)
         .slice(0, CONFIG.MAX_REPOS);
 
@@ -185,19 +197,19 @@ function displayRepos(repos) {
     let reposHTML = '';
     sortedRepos.forEach((repo, index) => {
         const languageColor = repo.language ? languageColors[repo.language] || languageColors.default : languageColors.default;
-        
+        //similar to display profile, however is based on repository information
         reposHTML += `
             <div class="repo-card" style="animation-delay: ${index * 0.1}s">
                 <h3>
                     <i class="fas fa-book"></i>
-                    ${repo.name}
+                    ${escapeHTML(repo.name)}
                 </h3>
                 ${repo.description ? `<p class="description">${repo.description}</p>` : ''}
                 <div class="repo-meta">
                     ${repo.language ? `
                         <span>
                             <span class="language-color" style="background-color: ${languageColor}"></span>
-                            ${repo.language}
+                         ${escapeHTML(repo.language)}
                         </span>
                     ` : ''}
                     ${repo.stargazers_count > 0 ? `
@@ -238,7 +250,7 @@ function formatNumber(num) {
     }
     return num.toString();
 }
-
+// converts an ISO timestamp into relative text like "3 days ago"
 function formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -252,7 +264,7 @@ function formatDate(dateString) {
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
     return `${Math.floor(diffDays / 365)} years ago`;
 }
-
+// toggles loading UI: spinner visibility, button disabled state, and button label
 function showLoading(show) {
     elements.loading.classList.toggle('hidden', !show);
     elements.searchBtn.disabled = show;
@@ -260,7 +272,7 @@ function showLoading(show) {
         '<i class="fas fa-spinner fa-spin"></i> Searching...' : 
         '<i class="fas fa-arrow-right"></i> Search';
 }
-
+//shows the error msg after 5 seconds
 function showError(message) {
     elements.error.textContent = message;
     elements.error.classList.add('show');
@@ -268,7 +280,7 @@ function showError(message) {
         elements.error.classList.remove('show');
     }, 5000);
 }
-
+//wipes the profile, hides error message,empties repo information
 function clearResults() {
     elements.profile.innerHTML = '';
     elements.profile.style.display = 'none';
@@ -290,10 +302,10 @@ async function suggestUsers(partialUsername) {
 // AI Feature 2: Repository Analysis
 function analyzeRepos(repos) {
     const analysis = {
-        totalStars: repos.reduce((sum, repo) => sum + repo.stargazers_count, 0),
-        totalForks: repos.reduce((sum, repo) => sum + repo.forks_count, 0),
-        languages: {},
-        mostPopular: repos.sort((a, b) => b.stargazers_count - a.stargazers_count)[0],
+        totalStars: repos.reduce((sum, repo) => sum + repo.stargazers_count, 0), //all star counts added
+        totalForks: repos.reduce((sum, repo) => sum + repo.forks_count, 0), //all fork counts added
+        languages: {}, //lang tally
+        mostPopular: repos.sort((a, b) => b.stargazers_count - a.stargazers_count)[0], //single repo with most stars
     };
 
     repos.forEach(repo => {
@@ -307,15 +319,19 @@ function analyzeRepos(repos) {
 // AI Feature 3: Export Results as JSON
 function exportData(data) {
     const jsonString = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([jsonString], { type: 'application/json' }); //file like object held in memory
+    const url = URL.createObjectURL(blob); 
     const a = document.createElement('a');
     a.href = url;
     a.download = `github_${data.user.login}_data.json`;
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url); //frees blob from memory
 }
+//triggers a file download of fetched data
+
+
 // AI Feature 4: Share Results
+//checks if api exists, if yes, passes it an object
 function shareResults(username) {
     if (navigator.share) {
         navigator.share({
@@ -323,10 +339,10 @@ function shareResults(username) {
             text: `Check out ${username}'s GitHub profile!`,
             url: `https://github.com/${username}`,
         }).catch(() => {});
-    } else {
+    } else {  //copies url to clipboard and alerts
         navigator.clipboard.writeText(`https://github.com/${username}`)
             .then(() => alert('Profile URL copied to clipboard!'))
-            .catch(() => {});
+            .catch(() => {}); //silencing errors
     }
 }
 
