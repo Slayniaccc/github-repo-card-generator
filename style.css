@@ -126,6 +126,7 @@ header h1 i {
     margin: 20px 0 30px;
     text-align: center;
     display: none;
+    animation: fadeInDown 0.5s ease both;
 }
 
 #profile img {
@@ -211,6 +212,7 @@ header h1 i {
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    animation: slideUp 0.5s ease both;
 }
 
 .repo-card::before {
