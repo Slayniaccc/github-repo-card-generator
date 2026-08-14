@@ -180,21 +180,44 @@ header h1 i {
     color: #fff;
 }
 
-#profile .profile-link {
-    display: inline-block;
+.profile-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-top: 10px;
+}
+
+#profile .profile-link,
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 24px;
     background: var(--accent);
     color: white;
     text-decoration: none;
+    border: none;
     border-radius: 6px;
     transition: var(--transition);
     font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
 }
 
-#profile .profile-link:hover {
+#profile .profile-link:hover,
+.action-btn:hover {
     background: #2ea043;
     transform: translateY(-2px);
+}
+
+.action-btn.action-btn--secondary {
+    background: #21262d;
+    border: 1px solid var(--border);
+}
+
+.action-btn.action-btn--secondary:hover {
+    background: #30363d;
 }
 
 /* Repository Analysis Section */

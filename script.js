@@ -9,6 +9,7 @@ const CONFIG = Object.freeze({
 }); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
+let lastData = null; // most recently displayed { user, repos }, used by export/share
 let errorTimer = null;
 function escapeHTML(str) {
     if (str == null) return '';
@@ -134,6 +135,7 @@ async function fetchRepos(username) {
     return repos; //similar to previous function, however returns information on repositories.
 }
 function displayResults(data) {
+    lastData = data;
     const { user, repos } = data;
     displayProfile(user);
     displayRepos(repos);
@@ -171,13 +173,23 @@ function displayProfile(user) {
                 </div>
             ` : ''}
         </div>
-        <a href="${user.html_url}" target="_blank" rel="noopener noreferrer" class="profile-link">
-            <i class="fab fa-github"></i> View GitHub Profile
-        </a>
+        <div class="profile-actions">
+            <a href="${user.html_url}" target="_blank" rel="noopener noreferrer" class="profile-link">
+                <i class="fab fa-github"></i> View GitHub Profile
+            </a>
+            <button type="button" id="exportBtn" class="action-btn action-btn--secondary">
+                <i class="fas fa-download"></i> Export JSON
+            </button>
+            <button type="button" id="shareBtn" class="action-btn">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+        </div>
     `;
 //formatting of the whole profile
     elements.profile.innerHTML = profileHTML;
     elements.profile.style.display = 'block';
+    elements.profile.querySelector('#exportBtn').addEventListener('click', () => exportData(lastData));
+    elements.profile.querySelector('#shareBtn').addEventListener('click', () => shareResults(user.login));
 } //builds a link to the github profile that opens in a new tab when clicked
 
 function displayRepos(repos) {
