@@ -11,6 +11,7 @@ const CONFIG = Object.freeze({
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
 let lastData = null; // most recently displayed { user, repos }, used by export/share
 let errorTimer = null;
+let suggestTimer = null;
 function escapeHTML(str) {
     if (str == null) return '';
     return String(str)
@@ -29,6 +30,7 @@ const elements = {
     error: document.getElementById('error'),
     searchBtn: document.getElementById('searchBtn'),
     analysis: document.getElementById('analysis'),
+    suggestions: document.getElementById('usernameSuggestions'),
 };
 // Language colors mapping
 const languageColors = {
@@ -55,6 +57,12 @@ const languageColors = {
 };
 // Event Listeners
 elements.form.addEventListener('submit', handleSubmit); //references the handlesubmit function
+
+elements.username.addEventListener('input', (event) => {
+    clearTimeout(suggestTimer);
+    const value = event.target.value.trim();
+    suggestTimer = setTimeout(() => suggestUsers(value), 300);
+});
 
 
 async function handleSubmit(event) {
@@ -312,12 +320,18 @@ function showError(message) {
 }
 // AI Feature 1: Smart Search with Suggestions
 async function suggestUsers(partialUsername) {
-    if (partialUsername.length < 2) return;
-    
+    if (partialUsername.length < 2) {
+        elements.suggestions.innerHTML = '';
+        return;
+    }
+
     try {
         const response = await fetch(`${CONFIG.GITHUB_API}/search/users?q=${encodeURIComponent(partialUsername)}&per_page=${CONFIG.SUGGESTION_LIMIT}`);
+        if (!response.ok) return;
         const data = await response.json();
-        console.log('Suggestions:', data.items.map(user => user.login));
+        elements.suggestions.innerHTML = data.items
+            .map(user => `<option value="${escapeHTML(user.login)}"></option>`)
+            .join('');
     } catch (error) {
         console.error('Suggestion error:', error);
     }

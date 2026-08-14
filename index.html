@@ -17,13 +17,15 @@
 <form id="repoForm">
     <div class="search-container">
         <i class="fas fa-search search-icon"></i>
-        <input 
-            type="text" 
-            id="username" 
-            placeholder="Enter GitHub username..." 
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter GitHub username..."
             required
             autocomplete="username"
+            list="usernameSuggestions"
         />
+        <datalist id="usernameSuggestions"></datalist>
         <button type="submit" id="searchBtn">
             <i class="fas fa-arrow-right"></i> Search
         </button>
