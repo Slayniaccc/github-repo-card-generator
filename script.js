@@ -9,6 +9,7 @@ const CONFIG = Object.freeze({
 }); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
+let errorTimer = null;
 function escapeHTML(str) {
     if (str == null) return '';
     return String(str)
@@ -280,6 +281,18 @@ function clearResults() {
     elements.profile.style.display = 'none';
     elements.repos.innerHTML = '';
     elements.error.classList.remove('show');
+    clearTimeout(errorTimer);
+}
+
+// shows the error banner with a message, auto-hiding it after CONFIG.ERROR_DISPLAY_MS
+function showError(message) {
+    elements.error.textContent = message;
+    elements.error.classList.remove('hidden');
+    elements.error.classList.add('show');
+    clearTimeout(errorTimer);
+    errorTimer = setTimeout(() => {
+        elements.error.classList.remove('show');
+    }, CONFIG.ERROR_DISPLAY_MS);
 }
 // AI Feature 1: Smart Search with Suggestions
 async function suggestUsers(partialUsername) {
@@ -299,7 +312,7 @@ function analyzeRepos(repos) {
         totalStars: repos.reduce((sum, repo) => sum + repo.stargazers_count, 0), //all star counts added
         totalForks: repos.reduce((sum, repo) => sum + repo.forks_count, 0), //all fork counts added
         languages: {}, //lang tally
-        mostPopular: repos.sort((a, b) => b.stargazers_count - a.stargazers_count)[0], //single repo with most stars
+        mostPopular: [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count)[0], //single repo with most stars, sorted on a copy so the input order isn't mutated
     };
 
     repos.forEach(repo => {
