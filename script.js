@@ -26,7 +26,8 @@ const elements = {
     repos: document.getElementById('repos'),
     loading: document.getElementById('loading'),
     error: document.getElementById('error'),
-    searchBtn: document.getElementById('searchBtn'), 
+    searchBtn: document.getElementById('searchBtn'),
+    analysis: document.getElementById('analysis'),
 };
 // Language colors mapping
 const languageColors = {
@@ -136,7 +137,8 @@ function displayResults(data) {
     const { user, repos } = data;
     displayProfile(user);
     displayRepos(repos);
-} //unpacks user and repos out of data,displays profile and repo info
+    displayAnalysis(repos);
+} //unpacks user and repos out of data,displays profile, repo info, and aggregate analysis
 
 function displayProfile(user) {
     const profileHTML = `
@@ -280,6 +282,8 @@ function clearResults() {
     elements.profile.innerHTML = '';
     elements.profile.style.display = 'none';
     elements.repos.innerHTML = '';
+    elements.analysis.innerHTML = '';
+    elements.analysis.classList.add('hidden');
     elements.error.classList.remove('show');
     clearTimeout(errorTimer);
 }
@@ -322,6 +326,45 @@ function analyzeRepos(repos) {
     });
 
     return analysis;
+}
+
+// renders aggregate stats (stars, forks, top language, top repo) computed by analyzeRepos
+function displayAnalysis(repos) {
+    if (!repos.length) {
+        elements.analysis.innerHTML = '';
+        elements.analysis.classList.add('hidden');
+        return;
+    }
+
+    const analysis = analyzeRepos(repos);
+    const topLanguage = Object.entries(analysis.languages).sort((a, b) => b[1] - a[1])[0];
+
+    elements.analysis.innerHTML = `
+        <h2>Repository Analysis</h2>
+        <div class="stats">
+            <div class="stat-item">
+                <i class="fas fa-star"></i>
+                <span>${formatNumber(analysis.totalStars)}</span> total stars
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-code-branch"></i>
+                <span>${formatNumber(analysis.totalForks)}</span> total forks
+            </div>
+            ${topLanguage ? `
+                <div class="stat-item">
+                    <i class="fas fa-code"></i>
+                    <span>${escapeHTML(topLanguage[0])}</span> most used
+                </div>
+            ` : ''}
+            ${analysis.mostPopular ? `
+                <div class="stat-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>${escapeHTML(analysis.mostPopular.name)}</span> top repo
+                </div>
+            ` : ''}
+        </div>
+    `;
+    elements.analysis.classList.remove('hidden');
 }
 // AI Feature 3: Export Results as JSON
 function exportData(data) {

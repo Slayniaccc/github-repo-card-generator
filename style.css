@@ -154,7 +154,7 @@ header h1 i {
     font-style: italic;
 }
 
-#profile .stats {
+.stats {
     display: flex;
     justify-content: center;
     gap: 30px;
@@ -196,6 +196,24 @@ header h1 i {
     background: #2ea043;
     transform: translateY(-2px);
 }
+
+/* Repository Analysis Section */
+#analysis {
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 30px;
+    margin: 0 0 30px;
+    animation: fadeIn 0.5s ease both;
+}
+
+#analysis h2 {
+    color: #fff;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
 /* Repositories Section */
 #repos {
     display: grid;
@@ -394,7 +412,7 @@ header h1 i {
         padding: 14px;
     }
 
-    #profile .stats {
+    .stats {
         flex-direction: column;
         gap: 10px;
     }
