@@ -319,6 +319,31 @@ header h1 i {
     margin-bottom: 16px;
 }
 
+/* NEW: repo list filter/sort controls */
+.repo-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 30px 0 -10px;
+}
+
+.repo-controls select {
+    background: var(--stat-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.repo-controls select:hover,
+.repo-controls select:focus-visible {
+    border-color: var(--accent);
+    outline: none;
+}
+
 /* Repositories Section */
 #repos {
     display: grid;

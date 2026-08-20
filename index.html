@@ -47,6 +47,17 @@
 
  <div id="profile"></div>
 <div id="analysis" class="hidden" aria-live="polite"></div>
+<!-- NEW: language filter + sort controls for the repository list, populated in script.js -->
+<div id="repoControls" class="repo-controls hidden">
+    <label for="languageFilter" class="sr-only">Filter by language</label>
+    <select id="languageFilter"></select>
+    <label for="repoSort" class="sr-only">Sort repositories</label>
+    <select id="repoSort">
+        <option value="stars">Most stars</option>
+        <option value="forks">Most forks</option>
+        <option value="updated">Recently updated</option>
+    </select>
+</div>
 <div id="repos"></div>
 <div id="error" class="hidden" role="alert" aria-live="assertive"></div>
   <script src="script.js"></script>

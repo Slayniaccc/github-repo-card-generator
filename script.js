@@ -44,6 +44,9 @@ const elements = {
     suggestions: document.getElementById('usernameSuggestions'),
     themeToggle: document.getElementById('themeToggle'), // NEW
     recentSearches: document.getElementById('recentSearches'), // NEW
+    repoControls: document.getElementById('repoControls'), // NEW
+    languageFilter: document.getElementById('languageFilter'), // NEW
+    repoSort: document.getElementById('repoSort'), // NEW
 };
 // Language colors mapping
 const languageColors = {
@@ -94,6 +97,17 @@ window.addEventListener('keydown', (event) => {
         event.preventDefault();
         elements.username.focus();
     }
+});
+
+// NEW: language filter / sort controls re-render the already-fetched repo list — no new API call needed
+elements.languageFilter.addEventListener('change', (event) => {
+    repoFilter.language = event.target.value;
+    renderRepoList();
+});
+
+elements.repoSort.addEventListener('change', (event) => {
+    repoFilter.sort = event.target.value;
+    renderRepoList();
 });
 
 
@@ -320,14 +334,56 @@ function displayProfile(user) {
     elements.profile.querySelector('#shareBtn').addEventListener('click', () => shareResults(user.login));
 } //builds a link to the github profile that opens in a new tab when clicked
 
+// NEW: full fetched repo list — kept separate from what's rendered so the filter/sort controls
+// below can operate on everything, not just the top 5 by stars
+let currentRepos = [];
+let repoFilter = { language: 'all', sort: 'stars' };
+
+const REPO_SORTERS = {
+    stars: (a, b) => b.stargazers_count - a.stargazers_count,
+    forks: (a, b) => b.forks_count - a.forks_count,
+    updated: (a, b) => new Date(b.updated_at) - new Date(a.updated_at),
+};
+
 function displayRepos(repos) {
-    // Sort by stars and take top 5
-    const sortedRepos = [...repos]
-        .sort((a, b) => b.stargazers_count - a.stargazers_count)
+    currentRepos = repos;
+    repoFilter.language = 'all'; // NEW: reset the language filter for each newly-searched user (sort preference is kept)
+    populateLanguageFilter(repos);
+    renderRepoList();
+}
+
+// NEW: builds the language dropdown from whatever languages this user's repos actually use
+function populateLanguageFilter(repos) {
+    const languages = [...new Set(repos.map(r => r.language).filter(Boolean))].sort();
+
+    if (!languages.length) {
+        elements.repoControls.classList.add('hidden');
+        return;
+    }
+
+    elements.languageFilter.innerHTML = [
+        '<option value="all">All languages</option>',
+        ...languages.map(lang => `<option value="${escapeHTML(lang)}">${escapeHTML(lang)}</option>`),
+    ].join('');
+    elements.languageFilter.value = repoFilter.language;
+    elements.repoControls.classList.remove('hidden');
+}
+
+// NEW: applies the active language filter + sort to the full repo list, then renders the top
+// CONFIG.MAX_REPOS of what remains — replaces the old fixed "top 5 by stars" behavior
+function renderRepoList() {
+    const filtered = repoFilter.language === 'all'
+        ? currentRepos
+        : currentRepos.filter(repo => repo.language === repoFilter.language);
+
+    const sortedRepos = [...filtered]
+        .sort(REPO_SORTERS[repoFilter.sort])
         .slice(0, CONFIG.MAX_REPOS);
 
     if (sortedRepos.length === 0) {
-        elements.repos.innerHTML = '<p>No repositories found</p>';
+        elements.repos.innerHTML = repoFilter.language === 'all'
+            ? '<p>No repositories found</p>'
+            : `<p>No ${escapeHTML(repoFilter.language)} repositories found</p>`;
         return;
     }
 
@@ -424,6 +480,7 @@ function clearResults() {
     elements.repos.innerHTML = '';
     elements.analysis.innerHTML = '';
     elements.analysis.classList.add('hidden');
+    elements.repoControls.classList.add('hidden'); // NEW: hide filter/sort controls until the next result set arrives
     elements.error.classList.remove('show');
     clearTimeout(errorTimer);
 }
