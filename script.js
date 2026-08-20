@@ -76,6 +76,17 @@ elements.username.addEventListener('input', (event) => {
     suggestTimer = setTimeout(() => suggestUsers(value), 300);
 });
 
+// NEW: Shareable/bookmarkable URLs — a copied link like ?user=torvalds reopens the same profile
+function getUsernameFromURL() {
+    return new URLSearchParams(window.location.search).get('user');
+}
+
+function updateURL(username) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('user', username);
+    history.replaceState(null, '', url); // replaceState avoids spamming browser history on every search
+}
+
 // NEW: Ctrl+/ (Cmd+/ on Mac) focuses the search input — implements the shortcut the README already documented
 window.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === '/') {
@@ -213,6 +224,7 @@ function displayResults(data) {
     displayProfile(user);
     displayRepos(repos);
     displayAnalysis(repos);
+    updateURL(user.login); // NEW: keeps the address bar in sync so the current profile is bookmarkable/shareable
 } //unpacks user and repos out of data,displays profile, repo info, and aggregate analysis
 
 function displayProfile(user) {
@@ -495,14 +507,19 @@ function exportData(data) {
 // AI Feature 4: Share Results
 //checks if api exists, if yes, passes it an object
 function shareResults(username) {
+    // NEW: shares a deep link back into this app (?user=...) instead of the raw github.com
+    // profile, so the recipient lands on the rendered card rather than GitHub's own page
+    const shareUrl = new URL(window.location.href);
+    shareUrl.searchParams.set('user', username);
+
     if (navigator.share) {
         navigator.share({
             title: `GitHub Profile: ${username}`,
             text: `Check out ${username}'s GitHub profile!`,
-            url: `https://github.com/${username}`,
+            url: shareUrl.toString(),
         }).catch(() => {});
     } else {  //copies url to clipboard and alerts
-        navigator.clipboard.writeText(`https://github.com/${username}`)
+        navigator.clipboard.writeText(shareUrl.toString())
             .then(() => alert('Profile URL copied to clipboard!'))
             .catch(() => {}); //silencing errors
     }
@@ -536,4 +553,12 @@ initTheme();
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 GitHub Repo Card Generator loaded!');
+
+    // NEW: deep-link support — a URL like ?user=torvalds reopens straight to that profile,
+    // so shared/bookmarked links (see shareResults() and updateURL()) actually work
+    const deepLinkUser = getUsernameFromURL();
+    if (deepLinkUser && GITHUB_USERNAME_PATTERN.test(deepLinkUser)) {
+        elements.username.value = deepLinkUser;
+        searchGitHub(deepLinkUser);
+    }
 });
