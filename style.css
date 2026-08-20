@@ -270,6 +270,38 @@ header h1 i {
     background: #30363d;
 }
 
+/* NEW: Recent Searches chips */
+.recent-searches {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -20px 0 30px;
+    font-size: 0.9rem;
+}
+
+.recent-searches .recent-label {
+    color: var(--muted);
+}
+
+.recent-chip {
+    background: var(--stat-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.85rem;
+}
+
+.recent-chip:hover,
+.recent-chip:focus-visible {
+    border-color: var(--accent);
+    color: var(--heading);
+    outline: none;
+}
+
 /* Repository Analysis Section */
 #analysis {
     background: var(--primary);
