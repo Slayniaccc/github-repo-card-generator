@@ -197,39 +197,39 @@ function displayProfile(user) {
         <p class="bio">${escapeHTML(user.bio) || 'No bio available'}</p>
         <div class="stats">
             <div class="stat-item">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-users" aria-hidden="true"></i>
                 <span>${formatNumber(user.followers)}</span> followers
             </div>
             <div class="stat-item">
-                <i class="fas fa-user-friends"></i>
+                <i class="fas fa-user-friends" aria-hidden="true"></i>
                 <span>${formatNumber(user.following)}</span> following
             </div>
             <div class="stat-item">
-                <i class="fas fa-code"></i>
+                <i class="fas fa-code" aria-hidden="true"></i>
                 <span>${formatNumber(user.public_repos)}</span> repos
             </div>
             ${user.location ? `
                 <div class="stat-item">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                     ${escapeHTML(user.location)}
                 </div>
             ` : ''}
             ${user.company ? `
                 <div class="stat-item">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-building" aria-hidden="true"></i>
                    ${escapeHTML(user.company)}
                 </div>
             ` : ''}
         </div>
         <div class="profile-actions">
             <a href="${user.html_url}" target="_blank" rel="noopener noreferrer" class="profile-link">
-                <i class="fab fa-github"></i> View GitHub Profile
+                <i class="fab fa-github" aria-hidden="true"></i> View GitHub Profile
             </a>
             <button type="button" id="exportBtn" class="action-btn action-btn--secondary">
-                <i class="fas fa-download"></i> Export JSON
+                <i class="fas fa-download" aria-hidden="true"></i> Export JSON
             </button>
             <button type="button" id="shareBtn" class="action-btn">
-                <i class="fas fa-share-alt"></i> Share
+                <i class="fas fa-share-alt" aria-hidden="true"></i> Share
             </button>
         </div>
     `;
@@ -258,7 +258,7 @@ function displayRepos(repos) {
         reposHTML += `
             <div class="repo-card" style="animation-delay: ${index * 0.1}s">
                 <h3>
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-book" aria-hidden="true"></i>
                     ${escapeHTML(repo.name)}
                 </h3>
                 ${repo.description ? `<p class="description">${escapeHTML(repo.description)}</p>` : ''}
@@ -271,25 +271,25 @@ function displayRepos(repos) {
                     ` : ''}
                     ${repo.stargazers_count > 0 ? `
                         <span>
-                            <i class="fas fa-star" style="color: #f1e05a;"></i>
+                            <i class="fas fa-star" aria-hidden="true" style="color: #f1e05a;"></i>
                             ${formatNumber(repo.stargazers_count)}
                         </span>
                     ` : ''}
                     ${repo.forks_count > 0 ? `
                         <span>
-                            <i class="fas fa-code-branch"></i>
+                            <i class="fas fa-code-branch" aria-hidden="true"></i>
                             ${formatNumber(repo.forks_count)}
                         </span>
                     ` : ''}
                     ${repo.updated_at ? `
                         <span>
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-clock" aria-hidden="true"></i>
                             ${formatDate(repo.updated_at)}
                         </span>
                     ` : ''}
                 </div>
                 <a href="${repo.html_url}" rel="noopener noreferrer" target="_blank" class="repo-link">
-                    View Repository <i class="fas fa-external-link-alt"></i>
+                    View Repository <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                 </a>
             </div>
         `;
@@ -333,8 +333,8 @@ function showLoading(show) {
     elements.loading.classList.toggle('hidden', !show);
     elements.searchBtn.disabled = show;
     elements.searchBtn.innerHTML = show ? 
-        '<i class="fas fa-spinner fa-spin"></i> Searching...' : 
-        '<i class="fas fa-arrow-right"></i> Search';
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...' : 
+        '<i class="fas fa-arrow-right" aria-hidden="true"></i> Search';
 }
 
 //wipes the profile, hides error message,empties repo information
@@ -420,22 +420,22 @@ function displayAnalysis(repos) {
         <h2>Repository Analysis</h2>
         <div class="stats">
             <div class="stat-item">
-                <i class="fas fa-star"></i>
+                <i class="fas fa-star" aria-hidden="true"></i>
                 <span>${formatNumber(analysis.totalStars)}</span> total stars
             </div>
             <div class="stat-item">
-                <i class="fas fa-code-branch"></i>
+                <i class="fas fa-code-branch" aria-hidden="true"></i>
                 <span>${formatNumber(analysis.totalForks)}</span> total forks
             </div>
             ${topLanguage ? `
                 <div class="stat-item">
-                    <i class="fas fa-code"></i>
+                    <i class="fas fa-code" aria-hidden="true"></i>
                     <span>${escapeHTML(topLanguage[0])}</span> most used
                 </div>
             ` : ''}
             ${analysis.mostPopular ? `
                 <div class="stat-item">
-                    <i class="fas fa-trophy"></i>
+                    <i class="fas fa-trophy" aria-hidden="true"></i>
                     <span>${escapeHTML(analysis.mostPopular.name)}</span> top repo
                 </div>
             ` : ''}

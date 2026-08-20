@@ -11,12 +11,12 @@
 <body>
 <div class="container">
         <header>
-            <h1><i class="fab fa-github"></i> GitHub Repo Card Generator</h1>
+            <h1><i class="fab fa-github" aria-hidden="true"></i> GitHub Repo Card Generator</h1>
              <p class="subtitle">Enter a GitHub username to view profile details, followers, and repositories</p>
         </header>
 <form id="repoForm">
     <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
+        <i class="fas fa-search search-icon" aria-hidden="true"></i>
         <!-- NEW: accessible label — the input previously relied on placeholder text alone -->
         <label for="username" class="sr-only">GitHub username</label>
         <input
@@ -29,7 +29,7 @@
         />
         <datalist id="usernameSuggestions"></datalist>
         <button type="submit" id="searchBtn">
-            <i class="fas fa-arrow-right"></i> Search
+            <i class="fas fa-arrow-right" aria-hidden="true"></i> Search
         </button>
     </div>
 </form>
