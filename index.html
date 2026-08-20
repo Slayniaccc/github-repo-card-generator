@@ -60,6 +60,29 @@
 </form>
 <!-- NEW: recent-searches chips, populated from localStorage in script.js -->
 <div id="recentSearches" class="recent-searches hidden"></div>
+
+<!-- NEW: side-by-side comparison of two profiles, independent of the main search above -->
+<div class="compare-toggle-row">
+    <button type="button" id="compareToggleBtn" class="compare-toggle">
+        <i class="fas fa-code-compare" aria-hidden="true"></i> Compare two profiles
+    </button>
+</div>
+<form id="compareForm" class="compare-form hidden">
+    <div class="search-container compare-input">
+        <label for="compareUsernameA" class="sr-only">First GitHub username</label>
+        <input type="text" id="compareUsernameA" placeholder="First username..." autocomplete="username" />
+    </div>
+    <span class="compare-vs" aria-hidden="true">vs</span>
+    <div class="search-container compare-input">
+        <label for="compareUsernameB" class="sr-only">Second GitHub username</label>
+        <input type="text" id="compareUsernameB" placeholder="Second username..." autocomplete="username" />
+    </div>
+    <button type="submit" id="compareBtn" class="action-btn">
+        <i class="fas fa-code-compare" aria-hidden="true"></i> Compare
+    </button>
+</form>
+<div id="compareResults" class="compare-results hidden" aria-live="polite"></div>
+
 <!-- NEW: aria-live regions so screen-reader users hear loading/result/error state changes -->
 <div id="loading" class="hidden" aria-live="polite" aria-atomic="true">
     <div class="spinner"></div>
