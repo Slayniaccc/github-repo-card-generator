@@ -17,6 +17,8 @@
 <form id="repoForm">
     <div class="search-container">
         <i class="fas fa-search search-icon"></i>
+        <!-- NEW: accessible label — the input previously relied on placeholder text alone -->
+        <label for="username" class="sr-only">GitHub username</label>
         <input
             type="text"
             id="username"
@@ -31,15 +33,16 @@
         </button>
     </div>
 </form>
-<div id="loading" class="hidden">
+<!-- NEW: aria-live regions so screen-reader users hear loading/result/error state changes -->
+<div id="loading" class="hidden" aria-live="polite" aria-atomic="true">
     <div class="spinner"></div>
     <p>Loading user data...</p>
 </div>
 
  <div id="profile"></div>
-<div id="analysis" class="hidden"></div>
+<div id="analysis" class="hidden" aria-live="polite"></div>
 <div id="repos"></div>
-<div id="error" class="hidden"></div>
+<div id="error" class="hidden" role="alert" aria-live="assertive"></div>
   <script src="script.js"></script>
   
 </body>
