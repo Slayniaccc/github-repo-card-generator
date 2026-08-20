@@ -7,6 +7,7 @@ const CONFIG = Object.freeze({
     SUGGESTION_LIMIT: 5,
     ERROR_DISPLAY_MS: 5000,
     CACHE_MAX_ENTRIES: 20, // NEW: caps the response cache so a long session can't grow it unbounded
+    MAX_REPO_PAGES: 3, // NEW: safety cap on pagination — 300 repos is enough for accurate analysis without unbounded API calls
 }); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
@@ -159,16 +160,29 @@ async function searchGitHub(username) { //takes validated username and fetches u
     return await response.json();
 } //crafts the url,fetches it.If there is an error message,error messages are thrown.In case of success user data returned as JS object
 
+// NEW: walks pages until GitHub returns a short page (fewer than REPOS_PER_PAGE) or MAX_REPO_PAGES
+// is hit — previously only the first 100 repos were ever fetched, so totalStars/totalForks/top
+// language in the analysis panel silently undercounted for any user with more than 100 repos.
 async function fetchRepos(username, signal) {
-    const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=${CONFIG.REPOS_PER_PAGE}`;
-    const response = await fetch(url, { signal });
-    checkRateLimit(response); // NEW
+    const repos = [];
+    let page = 1;
 
-    if (!response.ok) {
-        throw new Error(`Failed to fetch repositories`);
+    while (page <= CONFIG.MAX_REPO_PAGES) {
+        const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=${CONFIG.REPOS_PER_PAGE}&page=${page}`;
+        const response = await fetch(url, { signal });
+        checkRateLimit(response); // NEW
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch repositories`);
+        }
+
+        const pageRepos = await response.json();
+        repos.push(...pageRepos);
+
+        if (pageRepos.length < CONFIG.REPOS_PER_PAGE) break; // reached the last page
+        page++;
     }
 
-    const repos = await response.json();
     return repos; //similar to previous function, however returns information on repositories.
 }
 
