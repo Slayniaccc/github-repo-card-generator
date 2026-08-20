@@ -128,6 +128,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
     async function fetchUser(username) {
     const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}`;
     const response = await fetch(url);
+    checkRateLimit(response); // NEW: surface rate-limit resets before falling through to generic error handling
 
     if (!response.ok) {
         if (response.status === 404) {
@@ -142,6 +143,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
 async function fetchRepos(username) {
     const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=${CONFIG.REPOS_PER_PAGE}`;
     const response = await fetch(url);
+    checkRateLimit(response); // NEW
 
     if (!response.ok) {
         throw new Error(`Failed to fetch repositories`);
@@ -149,6 +151,17 @@ async function fetchRepos(username) {
 
     const repos = await response.json();
     return repos; //similar to previous function, however returns information on repositories.
+}
+
+// NEW: GitHub returns a normal 403 for rate-limiting; without this, users just saw "HTTP error! status: 403"
+// with no indication of what happened or when they could try again.
+function checkRateLimit(response) {
+    if (response.status === 403 && response.headers.get('X-RateLimit-Remaining') === '0') {
+        const resetEpochSeconds = Number(response.headers.get('X-RateLimit-Reset'));
+        const resetDate = new Date(resetEpochSeconds * 1000);
+        const minutes = Math.max(1, Math.ceil((resetDate - Date.now()) / 60000));
+        throw new Error(`GitHub API rate limit exceeded. Try again in about ${minutes} minute${minutes === 1 ? '' : 's'}.`);
+    }
 }
 function displayResults(data) {
     lastData = data;
