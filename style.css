@@ -358,8 +358,26 @@ header h1 i {
 }
 
 #error.show {
-    display: block;
+    /* NEW: flex layout accommodates the optional inline Retry button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
     animation: shake 0.5s ease;
+}
+
+/* NEW: Retry button styled for contrast against the red error background */
+#error .action-btn--secondary {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    padding: 6px 16px;
+    font-size: 0.9rem;
+}
+
+#error .action-btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .hidden {

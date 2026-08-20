@@ -146,7 +146,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
     } catch (error) {
         if (error.name === 'AbortError') return; // NEW: superseded by a newer search — let it own the UI
         console.error('Error:', error);
-        showError(error.message || 'Failed to fetch user data');
+        showError(error.message || 'Failed to fetch user data', () => searchGitHub(username)); // NEW: retry without retyping
 
      }finally{
         // NEW: only clear the loading state if this is still the active search — an aborted,
@@ -373,14 +373,24 @@ function clearResults() {
 }
 
 // shows the error banner with a message, auto-hiding it after CONFIG.ERROR_DISPLAY_MS
-function showError(message) {
-    elements.error.textContent = message;
+// NEW: accepts an optional onRetry callback — when present, renders a Retry button and
+// suppresses the auto-hide timer so the message doesn't vanish before the user can act on it
+function showError(message, onRetry) {
+    elements.error.innerHTML = `
+        <span>${escapeHTML(message)}</span>
+        ${onRetry ? '<button type="button" id="errorRetryBtn" class="action-btn action-btn--secondary">Retry</button>' : ''}
+    `;
     elements.error.classList.remove('hidden');
     elements.error.classList.add('show');
     clearTimeout(errorTimer);
-    errorTimer = setTimeout(() => {
-        elements.error.classList.remove('show');
-    }, CONFIG.ERROR_DISPLAY_MS);
+
+    if (onRetry) {
+        elements.error.querySelector('#errorRetryBtn').addEventListener('click', onRetry);
+    } else {
+        errorTimer = setTimeout(() => {
+            elements.error.classList.remove('show');
+        }, CONFIG.ERROR_DISPLAY_MS);
+    }
 }
 // AI Feature 1: Smart Search with Suggestions
 let suggestAbortController = null; // NEW: tracks the in-flight suggestion request so it can be cancelled
