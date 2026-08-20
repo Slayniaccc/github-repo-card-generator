@@ -85,9 +85,18 @@ async function handleSubmit(event) {
     await searchGitHub(username);
 }
 
+let searchAbortController = null; // NEW: tracks the in-flight main search so a rapid re-submit can cancel it
+
 async function searchGitHub(username) { //takes validated username and fetches user data and repos from GitHub API, handles caching, and displays results or errors
     clearResults();
     showLoading(true);
+
+    // NEW: cancel any search still running from a previous submission — without this, submitting
+    // a second username while the first is still loading could let the first response land last
+    // and overwrite the second one's results.
+    searchAbortController?.abort();
+    const thisController = new AbortController();
+    searchAbortController = thisController;
 
     try {
         // Check cache first
@@ -103,12 +112,12 @@ async function searchGitHub(username) { //takes validated username and fetches u
 
         // Fetch user and repos in parallel
         const [userData, reposData] = await Promise.all([
-            fetchUser(username),
-            fetchRepos(username),
+            fetchUser(username, thisController.signal),
+            fetchRepos(username, thisController.signal),
         ]);
 
         const data = { user: userData, repos: reposData };
-        
+
         // Cache the data
         cache.set(cacheKey, {
             data,
@@ -117,17 +126,20 @@ async function searchGitHub(username) { //takes validated username and fetches u
 
         displayResults(data);
     } catch (error) {
+        if (error.name === 'AbortError') return; // NEW: superseded by a newer search — let it own the UI
         console.error('Error:', error);
         showError(error.message || 'Failed to fetch user data');
 
      }finally{
-        showLoading(false);
-     } 
+        // NEW: only clear the loading state if this is still the active search — an aborted,
+        // superseded search must not stomp on the spinner/button state of the one that replaced it
+        if (searchAbortController === thisController) showLoading(false);
+     }
     } // on error: log for debugging, show the user a message, stop the spinner
 
-    async function fetchUser(username) {
+    async function fetchUser(username, signal) {
     const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}`;
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     checkRateLimit(response); // NEW: surface rate-limit resets before falling through to generic error handling
 
     if (!response.ok) {
@@ -140,9 +152,9 @@ async function searchGitHub(username) { //takes validated username and fetches u
     return await response.json();
 } //crafts the url,fetches it.If there is an error message,error messages are thrown.In case of success user data returned as JS object
 
-async function fetchRepos(username) {
+async function fetchRepos(username, signal) {
     const url = `${CONFIG.GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=${CONFIG.REPOS_PER_PAGE}`;
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     checkRateLimit(response); // NEW
 
     if (!response.ok) {
