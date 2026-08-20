@@ -937,6 +937,16 @@ elements.themeToggle?.addEventListener('click', () => {
 
 initTheme();
 
+// NEW: registers the service worker (sw.js) that caches the static app shell for offline use
+// and installability — never called for unsupported browsers, and failure is non-fatal
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((error) => {
+            console.error('Service worker registration failed:', error);
+        });
+    });
+}
+
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 GitHub Repo Card Generator loaded!');

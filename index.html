@@ -17,6 +17,8 @@
 
   <!-- NEW: inline SVG favicon (avatar glyph in the app's accent color) — no separate asset file needed -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23238636'/%3E%3Ccircle cx='50' cy='38' r='16' fill='white'/%3E%3Crect x='26' y='58' width='48' height='28' rx='14' fill='white'/%3E%3C/svg%3E" />
+  <!-- NEW: PWA manifest — makes the app installable; see manifest.json and sw.js -->
+  <link rel="manifest" href="manifest.json" />
 
   <link rel="stylesheet" href="style.css" />
   <!-- NEW: SRI hash + crossorigin pins this CDN file to exactly the bytes we tested against —
