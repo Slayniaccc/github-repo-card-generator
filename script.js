@@ -6,9 +6,19 @@ const CONFIG = Object.freeze({
      REPOS_PER_PAGE: 100,
     SUGGESTION_LIMIT: 5,
     ERROR_DISPLAY_MS: 5000,
+    CACHE_MAX_ENTRIES: 20, // NEW: caps the response cache so a long session can't grow it unbounded
 }); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
+
+// NEW: Maps preserve insertion order, so the oldest entry is always cache.keys().next().value —
+// evict it before inserting once the cache is full (simple FIFO, no extra bookkeeping needed)
+function cacheSet(key, data) {
+    if (cache.size >= CONFIG.CACHE_MAX_ENTRIES && !cache.has(key)) {
+        cache.delete(cache.keys().next().value);
+    }
+    cache.set(key, { data, timestamp: Date.now() });
+}
 let lastData = null; // most recently displayed { user, repos }, used by export/share
 let errorTimer = null;
 let suggestTimer = null;
@@ -119,10 +129,7 @@ async function searchGitHub(username) { //takes validated username and fetches u
         const data = { user: userData, repos: reposData };
 
         // Cache the data
-        cache.set(cacheKey, {
-            data,
-            timestamp: Date.now(),
-        });  //fetches username and repository amount at the same time, bundles as an object, caches the impormation
+        cacheSet(cacheKey, data); // NEW: routed through cacheSet() so the cache stays size-bounded
 
         displayResults(data);
     } catch (error) {
