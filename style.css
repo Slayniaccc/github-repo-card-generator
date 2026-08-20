@@ -319,6 +319,50 @@ header h1 i {
     margin-bottom: 16px;
 }
 
+/* NEW: language breakdown bar chart */
+.language-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.language-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 40px;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+}
+
+.language-bar-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.language-bar-track {
+    background: var(--stat-bg);
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.language-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.language-bar-percent {
+    color: var(--muted);
+    text-align: right;
+}
+
 /* NEW: repo list filter/sort controls */
 .repo-controls {
     display: flex;
@@ -577,6 +621,10 @@ header h1 i {
 
     header h1 {
         font-size: 1.5rem;
+    }
+
+    .language-bar-row {
+        grid-template-columns: 80px 1fr 36px; /* NEW: tighter label column on very small screens */
     }
 }
 

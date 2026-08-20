@@ -587,8 +587,37 @@ function displayAnalysis(repos) {
                 </div>
             ` : ''}
         </div>
+        ${renderLanguageBars(analysis.languages)}
     `;
     elements.analysis.classList.remove('hidden');
+}
+
+// NEW: renders a top-5 percentage-bar breakdown of languages across ALL fetched repos (not just
+// the filtered/sorted subset shown in the card grid), reusing the same color map as the repo cards
+function renderLanguageBars(languages) {
+    const entries = Object.entries(languages).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (!entries.length) return '';
+
+    const totalWithLanguage = Object.values(languages).reduce((sum, count) => sum + count, 0);
+
+    const rows = entries.map(([lang, count]) => {
+        const percent = Math.round((count / totalWithLanguage) * 100);
+        const color = languageColors[lang] || languageColors.default;
+        return `
+            <div class="language-bar-row">
+                <span class="language-bar-label">
+                    <span class="language-color" style="background-color: ${color}"></span>
+                    ${escapeHTML(lang)}
+                </span>
+                <div class="language-bar-track">
+                    <div class="language-bar-fill" style="width: ${percent}%; background-color: ${color}"></div>
+                </div>
+                <span class="language-bar-percent">${percent}%</span>
+            </div>
+        `;
+    }).join('');
+
+    return `<div class="language-bars">${rows}</div>`;
 }
 // AI Feature 3: Export Results as JSON
 function exportData(data) {
