@@ -84,12 +84,22 @@ window.addEventListener('keydown', (event) => {
 });
 
 
+// NEW: mirrors GitHub's actual username rules (alphanumeric + single, non-leading/trailing hyphens, max 39 chars)
+const GITHUB_USERNAME_PATTERN = /^[a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38}$/;
+
 async function handleSubmit(event) {
     event.preventDefault();
     const username = elements.username.value.trim();
 
     if (!username) {
         showError('Please enter a GitHub username');
+        return;
+    }
+
+    // NEW: reject obviously-invalid usernames locally instead of spending an API call (and
+    // rate-limit budget) on a request that could only ever come back 404
+    if (!GITHUB_USERNAME_PATTERN.test(username)) {
+        showError('That doesn\'t look like a valid GitHub username (letters, numbers, and single hyphens only)');
         return;
     }
 
