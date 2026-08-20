@@ -64,6 +64,14 @@ elements.username.addEventListener('input', (event) => {
     suggestTimer = setTimeout(() => suggestUsers(value), 300);
 });
 
+// NEW: Ctrl+/ (Cmd+/ on Mac) focuses the search input — implements the shortcut the README already documented
+window.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === '/') {
+        event.preventDefault();
+        elements.username.focus();
+    }
+});
+
 
 async function handleSubmit(event) {
     event.preventDefault();
