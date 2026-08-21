@@ -1,0 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2b3137;
+    --accent: #238636;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    /* NEW: tokens for values that were previously hardcoded (#fff, #21262d, #58a6ff...) so the
+       light theme below can override them instead of forking every rule */
+    --heading: #ffffff;
+    --body-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    --stat-bg: #21262d;
+    --link: #58a6ff;
+    --link-hover: #79c0ff;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --radius: 12px;
+    --radius-pill: 50px;
+    --radius-chip: 20px;
+    --accent-hover: #2ea043;
+    --on-accent: #fff;
+    --danger: #da3633;
+    --on-danger: #fff;
+    --transition: all 0.3s ease;
+}
+
+/* NEW: light theme — toggled by adding data-theme="light" to <html> (see script.js) */
+[data-theme="light"] {
+    --primary: #ffffff;
+    --accent: #1a7f37;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --muted: #59636e;
+    --heading: #1f2328;
+    --body-bg: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+    --stat-bg: #f6f8fa;
+    --link: #0969da;
+    --link-hover: #0550ae;
+    --shadow: 0 8px 24px rgba(140, 149, 159, 0.25);
+}

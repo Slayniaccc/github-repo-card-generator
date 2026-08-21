@@ -1,0 +1,169 @@
+/* NEW: Compare Users */
+.compare-toggle-row {
+    display: flex;
+    justify-content: center;
+    margin: -16px 0 20px;
+}
+
+.compare-toggle {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--radius-chip);
+    transition: var(--transition);
+}
+
+.compare-toggle:hover,
+.compare-toggle:focus-visible {
+    color: var(--heading);
+    background: var(--stat-bg);
+    outline: none;
+}
+
+.compare-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.compare-input {
+    flex: 1;
+    min-width: 180px;
+    max-width: 260px;
+    background: var(--stat-bg);
+    border-radius: var(--radius-pill);
+    padding: 0 16px;
+    border: 2px solid var(--border);
+    transition: var(--transition);
+}
+
+.compare-input:focus-within {
+    border-color: var(--accent);
+}
+
+.compare-input input {
+    width: 100%;
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.compare-vs {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.compare-results {
+    background: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px;
+    margin: 0 0 30px;
+    animation: fadeIn 0.5s ease both;
+}
+
+.compare-status {
+    text-align: center;
+    color: var(--muted);
+}
+
+.compare-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.compare-profile {
+    text-align: center;
+    flex: 1;
+    min-width: 140px;
+    max-width: 200px;
+}
+
+.compare-profile img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    margin-bottom: 10px;
+}
+
+.compare-profile h3 {
+    color: var(--heading);
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+}
+
+.compare-username {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.compare-vs-badge {
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: var(--radius-chip);
+    letter-spacing: 0.05em;
+}
+
+.compare-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.compare-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.compare-row:last-child {
+    border-bottom: none;
+}
+
+.compare-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--muted);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.compare-value.compare-winner {
+    color: var(--accent);
+}
+
+.compare-label {
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}

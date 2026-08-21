@@ -95,8 +95,8 @@ A modern, feature-rich GitHub profile viewer with repository analysis, side-by-s
 ```
 github-repo-card-generator/
 ├── index.html      # markup + all UI containers the JS renders into
-├── style.css        # theme tokens (light/dark), layout, components, animations
-├── script.js         # all app logic — fetching, caching, rendering, comparisons
+├── css/            # theme tokens (light/dark), layout, components, animations — one file per concern
+├── js/             # all app logic — fetching, caching, rendering, comparisons — one file per concern
 ├── manifest.json    # PWA metadata (name, icon, theme color, start URL)
 ├── sw.js            # service worker: caches the static shell for offline use
 └── README.md
@@ -139,29 +139,29 @@ GitHub's REST API is unauthenticated here, so it's capped at **60 requests/hour*
 
 | Function | File | What it does |
 |---|---|---|
-| `searchGitHub(username)` | `script.js` | Orchestrates the cached, cancellable fetch + render pipeline for one profile |
-| `compareUsers(usernameA, usernameB)` | `script.js` | Fetches two profiles in parallel and renders a side-by-side stat comparison |
-| `analyzeRepos(repos)` | `script.js` | Aggregates total stars/forks, language counts, and the top repo from a repo list |
-| `renderRepoList()` | `script.js` | Applies the active language filter, sort order, and "Show more" count to the fetched repos |
-| `downloadCard(user, analysis)` | `script.js` | Draws the profile + key stats onto a `<canvas>` and exports it as a PNG |
-| `checkRateLimit(response)` | `script.js` | Throws a human-readable error (with a retry estimate) when GitHub's rate limit is hit |
-| `cacheSet(key, data)` | `script.js` | Size-capped, FIFO-evicting write into the response cache |
+| `searchGitHub(username)` | `js/search.js` | Orchestrates the cached, cancellable fetch + render pipeline for one profile |
+| `compareUsers(usernameA, usernameB)` | `js/compare.js` | Fetches two profiles in parallel and renders a side-by-side stat comparison |
+| `analyzeRepos(repos)` | `js/analysis.js` | Aggregates total stars/forks, language counts, and the top repo from a repo list |
+| `renderRepoList()` | `js/repos.js` | Applies the active language filter, sort order, and "Show more" count to the fetched repos |
+| `downloadCard(user, analysis)` | `js/export.js` | Draws the profile + key stats onto a `<canvas>` and exports it as a PNG |
+| `checkRateLimit(response)` | `js/search.js` | Throws a human-readable error (with a retry estimate) when GitHub's rate limit is hit |
+| `cacheSet(key, data)` | `js/state.js` | Size-capped, FIFO-evicting write into the response cache |
 
 ---
 
 ## Customization
 
-**Tunable constants** — `CONFIG` at the top of `script.js`: `MAX_REPOS` (repos shown before "Show more"), `CACHE_DURATION`, `CACHE_MAX_ENTRIES`, `MAX_REPO_PAGES`, `SUGGESTION_LIMIT`, `ERROR_DISPLAY_MS`.
+**Tunable constants** — `CONFIG` at the top of `js/state.js`: `MAX_REPOS` (repos shown before "Show more"), `CACHE_DURATION`, `CACHE_MAX_ENTRIES`, `MAX_REPO_PAGES`, `SUGGESTION_LIMIT`, `ERROR_DISPLAY_MS`.
 
-**Theming** — all colors are CSS custom properties defined once on `:root` in `style.css` (`--primary`, `--accent`, `--border`, `--text`, `--muted`, `--heading`, `--body-bg`, `--stat-bg`, `--link`, `--link-hover`) and overridden under `[data-theme="light"]`. Changing a token updates every component that uses it, in both themes.
+**Theming** — all colors are CSS custom properties defined once on `:root` in `css/variables.css` (`--primary`, `--accent`, `--border`, `--text`, `--muted`, `--heading`, `--body-bg`, `--stat-bg`, `--link`, `--link-hover`) and overridden under `[data-theme="light"]`. Changing a token updates every component that uses it, in both themes.
 
-**Language colors** — the `languageColors` map in `script.js` covers 20+ languages with a `default` fallback; add entries there to color-code more.
+**Language colors** — the `languageColors` map in `js/state.js` covers 20+ languages with a `default` fallback; add entries there to color-code more.
 
 ---
 
 ## Future Improvements
 
-- **Automated tests** — `script.js` now has plenty of pure, testable logic (`formatNumber`, `formatDate`, `GITHUB_USERNAME_PATTERN`, `cacheSet` eviction, `REPO_SORTERS`, `analyzeRepos`) with zero coverage today. A small Vitest suite would catch regressions here.
+- **Automated tests** — the `js/` files now have plenty of pure, testable logic (`formatNumber`, `formatDate`, `GITHUB_USERNAME_PATTERN`, `cacheSet` eviction, `REPO_SORTERS`, `analyzeRepos`) with zero coverage today. A small Vitest suite would catch regressions here.
 - **Theme-aware download card** — `downloadCard()` still always renders the dark palette regardless of the active theme toggle; it should read the current CSS tokens instead.
 - **Authenticated API proxy** — a small serverless function that attaches a token would lift the 60 req/hour unauthenticated ceiling to 5,000/hour, which matters more now that comparisons and pagination use more requests per search.
 - **Proper PWA icon set** — the manifest currently ships a single `"sizes": "any"` SVG icon; adding real 192×192/512×512 (and maskable) PNGs would improve compatibility with launchers that don't support SVG icons.

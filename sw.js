@@ -1,13 +1,35 @@
 // Minimal service worker: caches the static app shell so the page loads offline / installs as a
 // PWA. Deliberately does NOT touch api.github.com or githubusercontent.com responses — those are
-// already handled by the in-memory, TTL'd cache in script.js, and caching them here would let
+// already handled by the in-memory, TTL'd cache in js/state.js, and caching them here would let
 // stale profile data silently outlive that TTL.
-const CACHE_NAME = 'repo-card-generator-v1';
+const CACHE_NAME = 'repo-card-generator-v3';
 const APP_SHELL = [
     './',
     './index.html',
-    './style.css',
-    './script.js',
+    './css/variables.css',
+    './css/base.css',
+    './css/search.css',
+    './css/profile.css',
+    './css/compare.css',
+    './css/analysis.css',
+    './css/repos.css',
+    './css/feedback.css',
+    './css/animations.css',
+    './css/responsive.css',
+    './css/accessibility.css',
+    './js/state.js',
+    './js/events-main.js',
+    './js/search.js',
+    './js/recent-searches.js',
+    './js/profile.js',
+    './js/repos.js',
+    './js/compare.js',
+    './js/utils.js',
+    './js/suggestions.js',
+    './js/analysis.js',
+    './js/export.js',
+    './js/theme.js',
+    './js/init.js',
     './manifest.json',
 ];
 

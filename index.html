@@ -20,7 +20,18 @@
   <!-- NEW: PWA manifest — makes the app installable; see manifest.json and sw.js -->
   <link rel="manifest" href="manifest.json" />
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- split by section so each part of the UI has its own file (see css/) -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/search.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/compare.css" />
+  <link rel="stylesheet" href="css/analysis.css" />
+  <link rel="stylesheet" href="css/repos.css" />
+  <link rel="stylesheet" href="css/feedback.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/accessibility.css" />
   <!-- NEW: SRI hash + crossorigin pins this CDN file to exactly the bytes we tested against —
        without it, a compromised or MITM'd CDN response could inject arbitrary CSS/fonts unnoticed -->
   <link
@@ -34,7 +45,7 @@
 <body>
 <div class="container">
         <header>
-            <!-- NEW: light/dark theme toggle, persisted to localStorage in script.js -->
+            <!-- NEW: light/dark theme toggle, persisted to localStorage -->
             <button type="button" id="themeToggle" class="theme-toggle" aria-label="Switch to light theme">
                 <i class="fas fa-sun" aria-hidden="true"></i>
             </button>
@@ -60,7 +71,7 @@
         </button>
     </div>
 </form>
-<!-- NEW: recent-searches chips, populated from localStorage in script.js -->
+<!-- NEW: recent-searches chips, populated from localStorage -->
 <div id="recentSearches" class="recent-searches hidden"></div>
 
 <!-- NEW: side-by-side comparison of two profiles, independent of the main search above -->
@@ -93,7 +104,7 @@
 
  <div id="profile"></div>
 <div id="analysis" class="hidden" aria-live="polite"></div>
-<!-- NEW: language filter + sort controls for the repository list, populated in script.js -->
+<!-- NEW: language filter + sort controls for the repository list, populated in js/repos.js -->
 <div id="repoControls" class="repo-controls hidden">
     <label for="languageFilter" class="sr-only">Filter by language</label>
     <select id="languageFilter"></select>
@@ -108,7 +119,20 @@
 <!-- NEW: "Show more" control — reveals additional repos from the filtered/sorted set instead of a hard top-5 cap -->
 <div id="repoShowMore" class="repo-show-more hidden"></div>
 <div id="error" class="hidden" role="alert" aria-live="assertive"></div>
-  <script src="script.js"></script>
+  <!-- split by concern so each part of the app logic has its own file (see js/); order matters -->
+  <script src="js/state.js"></script>
+  <script src="js/events-main.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/recent-searches.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/repos.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/suggestions.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/init.js"></script>
   
 </body>
 </html>
