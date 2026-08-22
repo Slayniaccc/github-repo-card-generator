@@ -48,6 +48,9 @@ function clearResults() {
     elements.repoControls.classList.add('hidden'); // NEW: hide filter/sort controls until the next result set arrives
     elements.repoShowMore.innerHTML = ''; // NEW
     elements.repoShowMore.classList.add('hidden'); // NEW
+    elements.activity.innerHTML = ''; // NEW: reset so a new search doesn't briefly show the previous profile's activity
+    elements.activity.classList.add('hidden');
+    elements.activity.dataset.loaded = '';
     elements.error.classList.remove('show');
     clearTimeout(errorTimer);
 }

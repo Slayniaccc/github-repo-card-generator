@@ -36,7 +36,7 @@ A modern, feature-rich GitHub profile viewer with repository analysis, side-by-s
 - User-friendly error messages with a one-click Retry
 - Shareable, bookmarkable URLs (`?user=<name>`) that reopen the same profile
 - Recent-searches history for one-click return visits
-- Side-by-side comparison of two profiles' followers, repos, stars, and forks
+- Side-by-side comparison of two profiles, including a followers/repos/stars/forks radar chart and a shared-vs-unique language breakdown
 - Installable as a PWA, with the static app shell cached for offline reloads
 
 ### Performance & Reliability
@@ -55,6 +55,7 @@ A modern, feature-rich GitHub profile viewer with repository analysis, side-by-s
 
 - Username suggestions as you type
 - Repository analysis: total stars, forks, top repo, and a language breakdown bar chart
+- Recent activity feed — a timeline of a profile's public GitHub events (pushes, stars, forks, PRs, issues…), lazily fetched on demand so a normal search doesn't spend a request on it
 - Filter and sort the repository list by language, stars, forks, or last updated, with "Show more" beyond the initial five
 - Downloadable PNG summary card (avatar, stats, top language) — an actual "card" export, not just JSON
 - Export full profile data as JSON
@@ -131,7 +132,9 @@ GitHub's REST API is unauthenticated here, so it's capped at **60 requests/hour*
 3. **Cache** — successful results are written through `cacheSet()`, which evicts the oldest entry once `CONFIG.CACHE_MAX_ENTRIES` is reached.
 4. **Render** — `displayResults()` renders the profile, the language-filterable/sortable repo grid (`renderRepoList()`, with "Show more" beyond the first five), and the stars/forks/language analysis panel (`displayAnalysis()`).
 5. **Persist** — the URL is kept in sync via `updateURL()` (`?user=<name>`) so results are bookmarkable and shareable, and the last few searches are saved to `localStorage` for the recent-searches chips.
-6. **Offline** — `sw.js` caches the static app shell (HTML/CSS/JS/manifest) on first load; it deliberately never caches `api.github.com` responses, since those already have their own TTL'd cache in step 3.
+6. **Activity (on demand)** — clicking "Recent Activity" calls `toggleActivity()`, which fetches `/users/:username/events/public` only the first time it's opened for a given profile (`fetchActivity()`, cached like everything else) and renders it via `renderActivity()`. This keeps the cost of a normal search at exactly 2 requests; the third is only spent if someone asks for it.
+7. **Compare (independent flow)** — `compareUsers()` fetches two profiles + repo sets in parallel (reusing the same cache), then `renderComparison()` draws the stat rows, an SVG radar chart (`renderRadarChart()`) normalizing followers/repos/stars/forks per-axis to whichever side is higher, and a shared-vs-unique language breakdown (`renderLanguageOverlap()`).
+8. **Offline** — `sw.js` caches the static app shell (HTML/CSS/JS/manifest) on first load; it deliberately never caches `api.github.com` responses, since those already have their own TTL'd cache in step 3.
 
 ---
 
@@ -141,9 +144,12 @@ GitHub's REST API is unauthenticated here, so it's capped at **60 requests/hour*
 |---|---|---|
 | `searchGitHub(username)` | `js/search.js` | Orchestrates the cached, cancellable fetch + render pipeline for one profile |
 | `compareUsers(usernameA, usernameB)` | `js/compare.js` | Fetches two profiles in parallel and renders a side-by-side stat comparison |
+| `renderRadarChart(a, b)` | `js/compare.js` | Draws an inline SVG radar chart comparing two profiles' followers/repos/stars/forks |
+| `renderLanguageOverlap(a, b)` | `js/compare.js` | Splits two profiles' languages into shared/only-A/only-B chip columns |
 | `analyzeRepos(repos)` | `js/analysis.js` | Aggregates total stars/forks, language counts, and the top repo from a repo list |
 | `renderRepoList()` | `js/repos.js` | Applies the active language filter, sort order, and "Show more" count to the fetched repos |
 | `downloadCard(user, analysis)` | `js/export.js` | Draws the profile + key stats onto a `<canvas>` and exports it as a PNG |
+| `toggleActivity(username)` | `js/activity.js` | Opens/closes the recent-activity panel, fetching `/events/public` only on first open per profile |
 | `checkRateLimit(response)` | `js/search.js` | Throws a human-readable error (with a retry estimate) when GitHub's rate limit is hit |
 | `cacheSet(key, data)` | `js/state.js` | Size-capped, FIFO-evicting write into the response cache |
 
@@ -151,7 +157,7 @@ GitHub's REST API is unauthenticated here, so it's capped at **60 requests/hour*
 
 ## Customization
 
-**Tunable constants** — `CONFIG` at the top of `js/state.js`: `MAX_REPOS` (repos shown before "Show more"), `CACHE_DURATION`, `CACHE_MAX_ENTRIES`, `MAX_REPO_PAGES`, `SUGGESTION_LIMIT`, `ERROR_DISPLAY_MS`.
+**Tunable constants** — `CONFIG` at the top of `js/state.js`: `MAX_REPOS` (repos shown before "Show more"), `CACHE_DURATION`, `CACHE_MAX_ENTRIES`, `MAX_REPO_PAGES`, `SUGGESTION_LIMIT`, `ERROR_DISPLAY_MS`, `ACTIVITY_LIMIT` (events shown in the recent-activity feed).
 
 **Theming** — all colors are CSS custom properties defined once on `:root` in `css/variables.css` (`--primary`, `--accent`, `--border`, `--text`, `--muted`, `--heading`, `--body-bg`, `--stat-bg`, `--link`, `--link-hover`) and overridden under `[data-theme="light"]`. Changing a token updates every component that uses it, in both themes.
 
@@ -165,8 +171,6 @@ GitHub's REST API is unauthenticated here, so it's capped at **60 requests/hour*
 - **Theme-aware download card** — `downloadCard()` still always renders the dark palette regardless of the active theme toggle; it should read the current CSS tokens instead.
 - **Authenticated API proxy** — a small serverless function that attaches a token would lift the 60 req/hour unauthenticated ceiling to 5,000/hour, which matters more now that comparisons and pagination use more requests per search.
 - **Proper PWA icon set** — the manifest currently ships a single `"sizes": "any"` SVG icon; adding real 192×192/512×512 (and maskable) PNGs would improve compatibility with launchers that don't support SVG icons.
-- **Richer comparisons** — extend the compare view with language overlap or a small radar/spider chart instead of just stat rows.
-- **Recent activity feed** — a timeline of public events (`/users/:username/events`) for the searched profile, budgeted carefully against the rate limit.
 
 ---
 

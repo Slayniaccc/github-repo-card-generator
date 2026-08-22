@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/profile.css" />
   <link rel="stylesheet" href="css/compare.css" />
   <link rel="stylesheet" href="css/analysis.css" />
+  <link rel="stylesheet" href="css/activity.css" />
   <link rel="stylesheet" href="css/repos.css" />
   <link rel="stylesheet" href="css/feedback.css" />
   <link rel="stylesheet" href="css/animations.css" />
@@ -104,6 +105,8 @@
 
  <div id="profile"></div>
 <div id="analysis" class="hidden" aria-live="polite"></div>
+<!-- NEW: recent-activity timeline, lazily fetched on demand via the profile's "Recent Activity" button -->
+<div id="activity" class="hidden" aria-live="polite"></div>
 <!-- NEW: language filter + sort controls for the repository list, populated in js/repos.js -->
 <div id="repoControls" class="repo-controls hidden">
     <label for="languageFilter" class="sr-only">Filter by language</label>
@@ -130,6 +133,7 @@
   <script src="js/utils.js"></script>
   <script src="js/suggestions.js"></script>
   <script src="js/analysis.js"></script>
+  <script src="js/activity.js"></script>
   <script src="js/export.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/init.js"></script>

@@ -7,6 +7,7 @@ const CONFIG = Object.freeze({
     ERROR_DISPLAY_MS: 5000,
     CACHE_MAX_ENTRIES: 20, // NEW: caps the response cache so a long session can't grow it unbounded
     MAX_REPO_PAGES: 3, // NEW: safety cap on pagination — 300 repos is enough for accurate analysis without unbounded API calls
+    ACTIVITY_LIMIT: 10, // NEW: public events shown in the recent-activity feed; fetched as a single page (no pagination) to keep this a one-request feature
 }); //holds tunable constants
 // Cache for API responses
 const cache = new Map(); //right structure for a key / value cache, no inherited prototype keys
@@ -40,6 +41,7 @@ const elements = {
     error: document.getElementById('error'),
     searchBtn: document.getElementById('searchBtn'),
     analysis: document.getElementById('analysis'),
+    activity: document.getElementById('activity'), // NEW
     suggestions: document.getElementById('usernameSuggestions'),
     themeToggle: document.getElementById('themeToggle'), // NEW
     recentSearches: document.getElementById('recentSearches'), // NEW

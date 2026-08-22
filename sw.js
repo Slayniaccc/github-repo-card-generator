@@ -2,7 +2,7 @@
 // PWA. Deliberately does NOT touch api.github.com or githubusercontent.com responses — those are
 // already handled by the in-memory, TTL'd cache in js/state.js, and caching them here would let
 // stale profile data silently outlive that TTL.
-const CACHE_NAME = 'repo-card-generator-v3';
+const CACHE_NAME = 'repo-card-generator-v4';
 const APP_SHELL = [
     './',
     './index.html',
@@ -12,6 +12,7 @@ const APP_SHELL = [
     './css/profile.css',
     './css/compare.css',
     './css/analysis.css',
+    './css/activity.css',
     './css/repos.css',
     './css/feedback.css',
     './css/animations.css',
@@ -27,6 +28,7 @@ const APP_SHELL = [
     './js/utils.js',
     './js/suggestions.js',
     './js/analysis.js',
+    './js/activity.js',
     './js/export.js',
     './js/theme.js',
     './js/init.js',

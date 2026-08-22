@@ -42,6 +42,9 @@ function displayProfile(user) {
             <button type="button" id="downloadCardBtn" class="action-btn action-btn--secondary">
                 <i class="fas fa-image" aria-hidden="true"></i> Download Card
             </button>
+            <button type="button" id="activityBtn" class="action-btn action-btn--secondary">
+                <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Recent Activity
+            </button>
         </div>
     `;
 //formatting of the whole profile
@@ -52,4 +55,6 @@ function displayProfile(user) {
     // NEW: renders the actual PNG "repo card" this app is named after — currentRepos is read at
     // click time, so it reflects whatever repos have loaded by the time the button is pressed
     elements.profile.querySelector('#downloadCardBtn').addEventListener('click', () => downloadCard(user, analyzeRepos(currentRepos)));
+    // NEW: lazily fetches/toggles the recent-activity timeline — see js/activity.js
+    elements.profile.querySelector('#activityBtn').addEventListener('click', () => toggleActivity(user.login));
 } //builds a link to the github profile that opens in a new tab when clicked

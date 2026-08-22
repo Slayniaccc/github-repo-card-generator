@@ -37,6 +37,10 @@
     #repos {
         grid-template-columns: 1fr;
     }
+
+    .overlap-columns {
+        grid-template-columns: 1fr; /* NEW: three overlap columns don't fit side by side on narrow screens */
+    }
 }
 
 @media (max-width: 400px) {

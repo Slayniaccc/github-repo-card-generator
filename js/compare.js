@@ -61,5 +61,111 @@ function renderComparison(a, b) {
             ${renderProfile(b)}
         </div>
         <div class="compare-stats">${rowsHTML}</div>
+        ${renderRadarChart(a, b)}
+        ${renderLanguageOverlap(a, b)}
+    `;
+}
+
+// NEW: the four axes plotted on the radar chart — each reads a stat off the same { user, analysis }
+// shape fetchProfileAndAnalysis() returns, so adding an axis here is a one-line change
+const RADAR_AXES = [
+    { label: 'Followers', get: (d) => d.user.followers },
+    { label: 'Repos', get: (d) => d.user.public_repos },
+    { label: 'Stars', get: (d) => d.analysis.totalStars },
+    { label: 'Forks', get: (d) => d.analysis.totalForks },
+];
+
+// NEW: radar/spider chart comparing two profiles across the axes above. Each axis is normalized to
+// whichever of the two profiles scores higher on it (not a shared global max), so the chart always
+// shows relative lean between the two rather than tiny slivers when one axis dwarfs the others.
+function renderRadarChart(a, b) {
+    const size = 260;
+    const center = size / 2;
+    const maxRadius = center - 44; // leaves room for axis labels outside the plotted area
+    const n = RADAR_AXES.length;
+    const angleFor = (i) => (Math.PI * 2 * i) / n - Math.PI / 2; // -90deg so the first axis points up
+
+    const maxes = RADAR_AXES.map((axis) => Math.max(axis.get(a), axis.get(b), 1)); // 1 avoids /0 when both are 0
+
+    const pointsFor = (data) => RADAR_AXES.map((axis, i) => {
+        const angle = angleFor(i);
+        const r = (axis.get(data) / maxes[i]) * maxRadius;
+        return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
+    }).join(' ');
+
+    const rings = [0.25, 0.5, 0.75, 1].map((frac) => {
+        const points = RADAR_AXES.map((_, i) => {
+            const angle = angleFor(i);
+            return `${center + frac * maxRadius * Math.cos(angle)},${center + frac * maxRadius * Math.sin(angle)}`;
+        }).join(' ');
+        return `<polygon points="${points}" class="radar-grid" />`;
+    }).join('');
+
+    const axisLines = RADAR_AXES.map((_, i) => {
+        const angle = angleFor(i);
+        const x = center + maxRadius * Math.cos(angle);
+        const y = center + maxRadius * Math.sin(angle);
+        return `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" class="radar-grid" />`;
+    }).join('');
+
+    const labels = RADAR_AXES.map((axis, i) => {
+        const angle = angleFor(i);
+        const x = center + (maxRadius + 24) * Math.cos(angle);
+        const y = center + (maxRadius + 24) * Math.sin(angle);
+        return `<text x="${x}" y="${y}" class="radar-axis-label" text-anchor="middle" dominant-baseline="middle">${axis.label}</text>`;
+    }).join('');
+
+    return `
+        <div class="compare-radar">
+            <svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Radar chart comparing ${escapeHTML(a.user.login)} and ${escapeHTML(b.user.login)} across followers, repos, stars, and forks">
+                ${rings}
+                ${axisLines}
+                <polygon points="${pointsFor(a)}" class="radar-shape radar-shape--a" />
+                <polygon points="${pointsFor(b)}" class="radar-shape radar-shape--b" />
+                ${labels}
+            </svg>
+            <div class="radar-legend">
+                <span class="radar-legend-item"><span class="radar-swatch radar-swatch--a" aria-hidden="true"></span>${escapeHTML(a.user.login)}</span>
+                <span class="radar-legend-item"><span class="radar-swatch radar-swatch--b" aria-hidden="true"></span>${escapeHTML(b.user.login)}</span>
+            </div>
+        </div>
+    `;
+}
+
+// NEW: three-column breakdown of which languages both profiles' repos share versus which are
+// unique to one side — reuses analyzeRepos().languages (already computed for the stat rows above)
+// and the same language color map as the repo cards / analysis bars.
+function renderLanguageOverlap(a, b) {
+    const langsA = new Set(Object.keys(a.analysis.languages));
+    const langsB = new Set(Object.keys(b.analysis.languages));
+    if (!langsA.size && !langsB.size) return '';
+
+    const shared = [...langsA].filter((lang) => langsB.has(lang)).sort();
+    const onlyA = [...langsA].filter((lang) => !langsB.has(lang)).sort();
+    const onlyB = [...langsB].filter((lang) => !langsA.has(lang)).sort();
+
+    const chip = (lang) => `
+        <span class="language-chip">
+            <span class="language-color" style="background-color: ${languageColors[lang] || languageColors.default}"></span>
+            ${escapeHTML(lang)}
+        </span>
+    `;
+
+    const column = (title, langs) => `
+        <div class="overlap-column">
+            <h4>${title}</h4>
+            <div class="overlap-chips">${langs.length ? langs.map(chip).join('') : '<span class="overlap-empty">—</span>'}</div>
+        </div>
+    `;
+
+    return `
+        <div class="compare-overlap">
+            <h3>Language overlap</h3>
+            <div class="overlap-columns">
+                ${column(`Shared (${shared.length})`, shared)}
+                ${column(`Only ${escapeHTML(a.user.login)}`, onlyA)}
+                ${column(`Only ${escapeHTML(b.user.login)}`, onlyB)}
+            </div>
+        </div>
     `;
 }
